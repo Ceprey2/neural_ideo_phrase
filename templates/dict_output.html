@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Multilingual dictionary of phraseological synonyms</title>
+</head>
+<body>
+
+
+
+<form method="post" action="{{url_for('get_language')}}">
+     <div class="form-group">
+        <input type="hidden" name="delete_input"/>
+    </div>
+
+ <select  type="submit" name="select_language" >
+
+            <option value="engllang">English</option>
+
+            <option value="ukrlang" >Українська</option>
+           <option value="ruslang" >Русский</option>
+        </select>
+     <label for= "select_language" id = "lab_lSelectLang" > Select interface language
+        languages </label>
+
+        <p>
+
+
+     <button type="submit" class="btn btn-submit" id="btnSignUp">Submit</button>
+</form>
+
+
+
+        <select name="select_centroid" id="select_centroid">
+
+            <option value="ukrlang" id="elemId_0">Select idea</option>
+
+        </select>
+
+
+
+        <label for= "selectLang" id = "lablSelectLang" > Select original and target
+        languages </label>
+
+
+            </p>
+
+
+            <BR/>
+
+<table style="width:100%">
+       <tr>
+      <div id="div_ideas" class="centralDiv">
+
+          </div>
+  </tr>
+  <tr>
+    <div id="div_phrases" class="centralDiv">
+
+        </div>
+  </tr>
+
+
+</table>
+
+
+
+
+   <select name="select_centroid_hierarchical" id="select_centroid_hierarchical">
+
+            <option value="centroids" id="elemId_0_hierarch">Select idea</option>
+
+        </select>
+<label for= "select_centroid_hierarchical" id = "lab_select_hiererchical" > Select descriptor
+        languages </label>
+
+  <select name="select_centroid_hierarchical" id="select_centroid_hierarchical_level2">
+
+            <option value="centroids" id="elemId_0_hierarch_lev2">Select idea</option>
+
+        </select>
+
+<label for= "select_centroid_hierarchical_level2" id = "lab_select_hiererchical_lev2" > Select subdescriptor
+        languages </label>
+
+
+
+
+<!--        <label for= "selectLang" id = "lablSelectLang" > Select original and target-->
+<!--        languages </label>-->
+
+
+            </p>
+
+
+            <BR/>
+    <BR/>    <BR/>    <BR/>
+<table style="width:100%">
+       <tr>
+      <div id="div_ideas_hierarchical" class="centralDiv">
+
+          </div>
+  </tr>
+  <tr>
+    <div id="div_phrases_hierarchical" class="centralDiv">
+
+        </div>
+  </tr>
+
+
+</table>
+
+
+
+
+
+<!--            </div>-->
+
+<!--            <table   style = "width:100%" >-->
+<!--            <tr>-->
+<!--            <div       id = "textTrans"         class         = "centralDiv" >-->
+<!--            Examples  {{all_centroids}}-->
+<!--        </div>-->
+<!--        </tr>-->
+<!--        <tr>-->
+<!--        <div id ="div_ideas" class        = "centralDiv" >-->
+<!--            { % set new_var = all_centroids % }-->
+<!--        Examples {{new_var}}-->
+<!--        </div>-->
+<!--        </tr>-->
+
+
+<!--        </table>-->
+<!--        <BR/>-->
+
+
+
+
+            <script     src = "//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" ></script>
+        <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+
+             <script type=text/javascript>
+
+                  var var_centroid_phrases = {{dict_centroid_phrases|safe}};
+                  var dict_centroid_phrases_hierarchical = {{dict_centroid_phrases_hierarchical|safe}};
+
+
+
+
+
+                 </script>
+
+            <script src="static/js/output_phrases.js"></script>
+
+</body>
+
+        </html>
