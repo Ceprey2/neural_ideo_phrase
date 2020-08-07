@@ -1,4 +1,5 @@
           //  var centroids_arr = centroids.split(" ");
+            var centroids_subcentroids = new Array();
 
 
             console.log("first element from dict_centroid_phrases|safe")
@@ -9,7 +10,17 @@
               console.log(parsed_centroid_phrases["neighbors"])
             console.log("centroids centroids_arr")
 
+            function parse_k_means_dict(parsed_centroid_phrases){
 
+
+
+                  parsed_centroid_phrases.forEach(function (element){
+
+                    centroids_subcentroids.push(element["main_centroid"])
+                  });
+            };
+
+              alert(centroids_subcentroids);
 
 
 

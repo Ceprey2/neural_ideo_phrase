@@ -1,23 +1,14 @@
-import pandas as pd
 import csv
-
-from sklearn.cluster import KMeans
-from sklearn.feature_extraction.text import TfidfVectorizer
-from flask import render_template, url_for
-from flask import Flask, request
 import json
-import numpy as np
-
 
 import matplotlib.pyplot as plt
-from scipy.cluster.hierarchy import linkage, dendrogram, ward, cut_tree
+import pandas as pd
+from flask import Flask, request
+from flask import render_template
 from scipy.cluster.hierarchy import fcluster, leaders, centroid
-
-
-
-
-
-
+from scipy.cluster.hierarchy import linkage, dendrogram, ward, cut_tree
+from sklearn.cluster import KMeans
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 #print(ukr_descriptors[0:33])
 
@@ -372,9 +363,9 @@ def k_means_subclusters_classifier (df_clusters_list, phrases):
 
 
     dict_clusters_array = []
-    print("dataframe", "first element from dataframe")
-    print(df_clusters_list)
-    print(df_clusters_list[0])
+    #print("dataframe", "first element from dataframe")
+    #print(df_clusters_list)
+    #print(df_clusters_list[0])
     descriptors = []
     for cluster in df_clusters_list:
         descrs = [entry['ukrlanghetmans'] for entry in cluster]
@@ -396,8 +387,8 @@ app = Flask(__name__)
 @app.route('/')
 def main():
     csv_structured_data = pd.read_csv('all_phrases.csv')
-    print("len(csv_structured_data)")
-    print(len(csv_structured_data))
+    #print("len(csv_structured_data)")
+    #print(len(csv_structured_data))
     descriptors = csv_structured_data['ukrlanghetmans']
     ukrphrases = csv_structured_data['ukrlang']
     dict_from_csv = list(csv.DictReader(open('all_phrases.csv')))
@@ -407,9 +398,11 @@ def main():
     #print(labels)
 
     subclusters_dict = get_k_means_subclusters_array(dict_from_csv, labels)
-    #dict_subcluster_phrases = k_means_subclusters_classifier(subclusters_dict, ukrphrases)
-    #print("dict_centroid_phrases")
-    #print(dict_centroid_phrases)
+    dict_subcluster_phrases = k_means_subclusters_classifier(subclusters_dict, ukrphrases)
+    print("subclusters dict shape")
+    print(dict_subcluster_phrases)
+    print("dict_centroid_phrases")
+    print(dict_centroid_phrases)
     dict_centroid_phrases_hierarchical, labels2 = hierarchical_clustering(descriptors, ukrphrases, csv_structured_data)
     agglomerative_clustering(descriptors)
 
