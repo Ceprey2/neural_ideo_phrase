@@ -399,7 +399,7 @@ def main():
 
     subclusters_dict = get_k_means_subclusters_array(dict_from_csv, labels)
     dict_subcluster_phrases = k_means_subclusters_classifier(subclusters_dict, ukrphrases)
-    print("subclusters dict shape")
+    print("subclusters dict")
     print(dict_subcluster_phrases)
     print("dict_centroid_phrases")
     print(dict_centroid_phrases)
