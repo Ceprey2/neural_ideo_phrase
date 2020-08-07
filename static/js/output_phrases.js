@@ -56,8 +56,8 @@
             if (descriptor1 == parsed_element["centroid"].trim() && (descriptor2 == parsed_element["centroid"].trim() || descriptor2 == "")) {
 
 
-                $('#div_ideas').text("Idea:" + parsed_element["centroid"].trim() + "<br/>" + "Related ideas: " + parsed_element["neighbors"]);
-                $('#div_phrases').text($('#div_phrases').text() + " " + parsed_element["ukrlangphrases"]);
+                // $('#div_ideas').text("Idea:" + parsed_element["centroid"].trim() + "<br/>" + "Related ideas: " + parsed_element["neighbors"]);
+                // $('#div_phrases').text($('#div_phrases').text() + " " + parsed_element["ukrlangphrases"]);
 
                 console.log("ukrlangphrases")
                 console.log(parsed_element["ukrlangphrases"])
@@ -67,7 +67,7 @@
 
         });
 
-        return phrases_str_to_return
+        return phrases_str_to_return.replace("null", " ");
 
     }
 
@@ -109,8 +109,6 @@
                    console.log("$('#select_centroid_hierarchical_level2').val()")
                    console.log($('#select_centroid_hierarchical_level2').val())
 
-                $('#div_ideas').text("ideas");
-                $('#div_phrases_hierarchical').text("ukrlangphrases");
 
 
                  $('#div_phrases_hierarchical').text(get_phrases_according_descriptors($('#select_centroid_hierarchical_level2').val().trim(), "", dict_centroid_phrases_hierarchical));

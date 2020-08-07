@@ -7,7 +7,7 @@
 <body>
 
 
-
+K-means classifier
 <form method="post" action="{{url_for('get_language')}}">
      <div class="form-group">
         <input type="hidden" name="delete_input"/>
@@ -64,7 +64,7 @@
 </table>
 
 
-
+Hierarchical spicy classifier
 
    <select name="select_centroid_hierarchical" id="select_centroid_hierarchical">
 
@@ -141,7 +141,7 @@
 
              <script type=text/javascript>
 
-                  var var_centroid_phrases = {{dict_centroid_phrases|safe}};
+                  var var_centroid_phrases = {{dict_centroid_phrases['entries']|safe}};
                   var dict_centroid_phrases_hierarchical = {{dict_centroid_phrases_hierarchical|safe}};
 
 
