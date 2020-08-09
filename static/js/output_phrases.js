@@ -6,19 +6,24 @@
             console.log(var_centroid_phrases[0])
 
             var parsed_centroid_phrases = JSON.parse(var_centroid_phrases[0]);
-              console.log("neighbors of the first data element")
-              console.log(parsed_centroid_phrases["neighbors"])
+              console.log("main_centroid of the first data element")
+              console.log(parsed_centroid_phrases["main_centroid"])
             console.log("centroids centroids_arr")
 
-            function parse_k_means_dict(parsed_centroid_phrases){
+            function parse_k_means_dict(var_centroid_phrases){
 
 
 
-                  parsed_centroid_phrases.forEach(function (element){
 
-                    centroids_subcentroids.push(element["main_centroid"])
+                  var_centroid_phrases.forEach(function (element){
+
+                      current_entry = JSON.parse(element);
+
+                    centroids_subcentroids.push(current_entry["main_centroid"])
                   });
             };
+
+              parse_k_means_dict(var_centroid_phrases);
 
               alert(centroids_subcentroids);
 
@@ -28,7 +33,7 @@
                     console.log("centroids_element");
                     console.log(entry_element);
                     parsed_entry_element = JSON.parse(entry_element)
-                    current_centroid = parsed_entry_element["centroid"]
+                    current_centroid = parsed_entry_element["main_centroid"]
                 $('#select_centroid').append(`<option value=${current_centroid}>
                                        ${current_centroid}
                                   </option>`)
