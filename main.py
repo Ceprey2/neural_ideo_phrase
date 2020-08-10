@@ -5,21 +5,16 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from flask import Flask, request
 from flask import render_template
+from scipy.cluster import hierarchy as sch
 from scipy.cluster.hierarchy import fcluster, leaders, centroid
 from scipy.cluster.hierarchy import linkage, dendrogram, ward, cut_tree
+from scipy.spatial.distance import pdist
 from sklearn.cluster import KMeans
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-#print(ukr_descriptors[0:33])
-
-
-
-
-#print(features_descriptors)
-wcss=[]
 number_of_clusters = 3
-rng = range(3,4)
-inertias = []
+
+
 
 def print_cut_tree_features(cut_tr, names):
 
@@ -70,10 +65,17 @@ def transform_labels_to_names(labels_ward_1, labels_ward_2, descriptors):
     return  labels_ward_1_named, labels_ward_2_named
 
 
-def hierarchical_clustering(descriptors, phrases, csv_structured_data):
-    dict_centroid_phrases_hierarchical = []
+def hierarchical_clustering(dict_from_csv,current_langugage):
+    dict_subclusters_array_hierarchical = []
 
-    csv_structured_data.fillna('null', inplace=True)
+    wcss = []
+    entries = []
+
+
+    df_dict_from_csv = pd.DataFrame(dict_from_csv)
+    descriptors = df_dict_from_csv[current_langugage+'hetmans']
+    phrases =  df_dict_from_csv[current_langugage]
+    df_dict_from_csv.fillna('null', inplace=True)
 
     # Calculate the linkage: mergings
     tfidf = TfidfVectorizer(token_pattern=r"(?u)\b\w+'?\w+\b")
@@ -110,7 +112,6 @@ def hierarchical_clustering(descriptors, phrases, csv_structured_data):
     #print("height 0")
     #print_cut_tree_features(cutree, names)
 
-    from scipy.cluster import hierarchy as sch
 
     to_tree_obj = sch.to_tree(Z_ward)
     #print("to_tree_obj")
@@ -124,7 +125,7 @@ def hierarchical_clustering(descriptors, phrases, csv_structured_data):
     #Z = linkage(Y)
     #leaders = scipy.cluster.hierarchy.leaders(X, Z)
 
-    from scipy.spatial.distance import pdist
+
 
     y_dist = pdist(X)
     Z_centroid = centroid(y_dist)
@@ -170,13 +171,17 @@ def hierarchical_clustering(descriptors, phrases, csv_structured_data):
     #print("height 3")
     #print_cut_tree_features(cutree, names)
 
-    labels_ward_1 = fcluster(Z_ward, 1, criterion='distance')
+    labels_ward_1 = fcluster(Z_ward, 2,
+                             criterion='distance')  # LET'S ASSIGN NUMBER ONE TO THE UPPER LEVEL. HEIGT 2 IS HIGHER THAN 1 IN THE TREE
+    # print("ward labels 2")
+    print("111 labels 1")
+    print(set(labels_ward_1))
+
+    labels_ward_2 = fcluster(Z_ward, 1, criterion='distance')
     #print("ward labels 1")
 
-
-
-    labels_ward_2 = fcluster(Z_ward, 2, criterion='distance')
-    #print("ward labels 2")
+    print("111 labels 2")
+    print(set(labels_ward_2))
 
 
     labels_ward_1_named, labels_ward_2_named = transform_labels_to_names(labels_ward_1, labels_ward_2, descriptors)
@@ -191,9 +196,6 @@ def hierarchical_clustering(descriptors, phrases, csv_structured_data):
     print("DataFrame of two level labels")
     print(df_ward)
 
-
-
-
     # Create a DataFrame with labels and varieties as columns: df
     # df = pd.DataFrame({'labels': labels, 'descriptors': descriptors})
 
@@ -205,20 +207,47 @@ def hierarchical_clustering(descriptors, phrases, csv_structured_data):
 
     # Display ct
     #print(ct)
+    for lb1 in set(labels_ward_1_named):
+        entries = []
+        print("label_number")
+        print(lb1)
 
-    for lb1, lb2, ukrlangphrases in zip(labels_ward_1_named, labels_ward_2_named, csv_structured_data["ukrlang"]):
-        entry = {
-            "centroid": lb1,
-            "subcentroid": lb2,
-            "ukrlangphrases": ukrlangphrases
-        }
+        dict_centroid_phrases_hierarchical_subcluster = {"main_centroid": lb1,
+                                                         "entries": entries}
 
-
-        dict_centroid_phrases_hierarchical.append(json.dumps(entry))
-
+        for row_number in range(len(dict_from_csv)):
 
 
-    return dict_centroid_phrases_hierarchical, labels
+            if ((lb1 == labels_ward_1_named[row_number])):
+             entry = {
+                        "centroid": labels_ward_2_named[row_number],
+
+                        "ukrlangphrases": df_dict_from_csv["ukrlang"][row_number],
+                        "spanlangphrases": df_dict_from_csv["spanishlang"][row_number],
+                        "engllangphrases": df_dict_from_csv["engllang"][row_number],
+                        "frenchlangphrases": df_dict_from_csv["frenchlang"][row_number],
+                        "itallangphrases": df_dict_from_csv["itallang"][row_number],
+                        "latinlangphrases": df_dict_from_csv["latinlang"][row_number],
+                        "ruslangphrases": df_dict_from_csv["ruslang"][row_number],
+                        "hebrlangphrases": df_dict_from_csv["hebrlang"][row_number]
+
+                }
+
+             entries.append((entry))
+                #dict_centroid_phrases_hierarchical = {"main_centroid": "", "entries": entries} # THIS LINE IS FOR COMPARING FORMAT OF RETURNING DICT
+
+
+        dict_centroid_phrases_hierarchical_subcluster["entries"] = entries
+
+        print("Length of hierarchical subcluster")
+        print(len(dict_centroid_phrases_hierarchical_subcluster['entries']))
+        print(dict_centroid_phrases_hierarchical_subcluster['main_centroid'])
+        print(dict_centroid_phrases_hierarchical_subcluster['entries'])
+
+        dict_subclusters_array_hierarchical.append(dict_centroid_phrases_hierarchical_subcluster)
+        # print("dict_centroid_phrases_hierarchical_subcluster")
+
+    return dict_subclusters_array_hierarchical, labels
 
 
 def agglomerative_clustering(descriptors):
@@ -240,13 +269,16 @@ def agglomerative_clustering(descriptors):
 
 def k_means_classifier(descriptors, csv_dict_structured_data):
 
+    rng = range(3, 4)
+    inertias = []
+
     # print("type(csv_structured_data)")
     # print(type(csv_structured_data))
     df_structured_data = pd.DataFrame(csv_dict_structured_data) #converting ordered dict to dataframe
-    print("Recieved df_structured_data")
-    print(df_structured_data)
-    print("Recieved descritptors")
-    print(descriptors)
+    # print("Recieved df_structured_data")
+    # print(df_structured_data)
+    # print("Recieved descritptors")
+    # print(descriptors)
     df_structured_data.fillna('null', inplace=True) # replacing Nan cells with null for js to understand during json parsing
 
     entries = []
@@ -379,14 +411,14 @@ def k_means_subclusters_classifier (df_subclusters_list, current_language):
     #print(df_clusters_list[0])
 
     for subcluster in df_subclusters_list:
-        descriptors = []
+        descriptors_sequences = []
         #descrs = [entry[current_language+'hetmans'].replace("*", "").strip().lower().split(" ") for entry in subcluster] # storing all descriptors in the given language for each phrase
         for entry in subcluster:
-            descrs = entry[current_language+'hetmans'].replace("*", "").strip().lower() # TODO: Perform this normalizing before, for example, in CSV file
-            descriptors.append(descrs)
+            descr_sequence = entry[current_language+'hetmans'].replace("*", "").strip().lower() # TODO: Perform this normalizing before, for example, in CSV file
+            descriptors_sequences.append(descr_sequence)# There should be as many sequences as rows (entries) in subcluster
 
         #descriptors.extend(descrs)
-        dict_subcluster, labels = k_means_classifier(descriptors, subcluster)
+        dict_subcluster, labels = k_means_classifier(descriptors_sequences, subcluster)
 
 
 
@@ -403,39 +435,19 @@ def k_means_subclusters_classifier (df_subclusters_list, current_language):
 app = Flask(__name__)
 @app.route('/')
 def main():
-    csv_structured_data = pd.read_csv('phrases.csv')
-    #print("len(csv_structured_data)")
-    #print(len(csv_structured_data))
-    #descriptors = csv_structured_data['ukrlanghetmans']
-    #ukrphrases = csv_structured_data['ukrlang']
     dict_from_csv = list(csv.DictReader(open('phrases.csv')))
-    descriptors = [descr['ukrlanghetmans'] for descr in dict_from_csv]
-    #ukrphrases = [descr['ukrlang'] for descr in dict_from_csv]
 
+    current_language = "ukrlang"
+
+    descriptors = [descr[current_language + 'hetmans'] for descr in dict_from_csv]
     dict_centroid_phrases, labels = k_means_classifier(descriptors, dict_from_csv)
-    #print("labels from k_means")
-    #print(labels)
-
     subclusters_dict = get_k_means_subclusters_array(dict_from_csv, labels)
-    dict_subcluster_phrases = k_means_subclusters_classifier(subclusters_dict, current_language="ukrlang")
-    print("subclusters dict [1]")
-    print(dict_subcluster_phrases[1])
-    print("dict_centroid_phrases")
-    print(dict_centroid_phrases)
-    descriptors = csv_structured_data['ukrlanghetmans']
-    ukrphrases = csv_structured_data['ukrlang']
-    dict_centroid_phrases_hierarchical, labels2 = hierarchical_clustering(descriptors, ukrphrases, csv_structured_data)
-    agglomerative_clustering(descriptors)
+    dict_subcluster_phrases = k_means_subclusters_classifier(subclusters_dict, current_language)
 
-    #print('all_centroids', all_centroids)
-
-    #get_select_language_option()
-    #print("dict_centroid_phrases_hierarchical")
-    #print(type(dict_centroid_phrases_hierarchical))
-    #print("dict_centroid_phrases")
-    #print(type(dict_centroid_phrases))
-    return render_template('dict_output.html', dict_centroid_phrases=dict_subcluster_phrases, dict_centroid_phrases_hierarchical=dict_centroid_phrases_hierarchical)
-    # return "OK"
+    dict_centroid_phrases_hierarchical, labels2 = hierarchical_clustering(dict_from_csv, current_language)
+    return render_template('dict_output.html',
+                           dict_centroid_phrases=dict_subcluster_phrases,
+                           dict_centroid_phrases_hierarchical=dict_centroid_phrases_hierarchical)
 
 def draw_classifier_plot(rng, inertias):
     plt.plot(rng, inertias, '-o')
@@ -447,18 +459,18 @@ def draw_classifier_plot(rng, inertias):
 
 @app.route('/get_language', methods=['POST'])
 def get_language():
-    csv_structured_data = pd.read_csv('phrases.csv')
+
     dict_from_csv = list(csv.DictReader(open('phrases.csv')))
     print("Changing descrpitpors language")
     current_language = request.form.get('select_language')
+    if(current_language is None): current_language = "ukrlang"
     print(current_language)
     descriptors = [descr[current_language+'hetmans'] for descr in dict_from_csv]
     dict_centroid_phrases, labels = k_means_classifier(descriptors, dict_from_csv)
     subclusters_dict = get_k_means_subclusters_array(dict_from_csv, labels)
     dict_subcluster_phrases = k_means_subclusters_classifier(subclusters_dict, current_language)
-    descriptors = csv_structured_data[current_language+'hetmans']
-    phrases = csv_structured_data[current_language]
-    dict_centroid_phrases_hierarchical, labels2 = hierarchical_clustering(descriptors, phrases, csv_structured_data)
+
+    dict_centroid_phrases_hierarchical, labels2 = hierarchical_clustering(dict_from_csv, current_language)
     return render_template('dict_output.html',
                            dict_centroid_phrases=dict_subcluster_phrases,
                            dict_centroid_phrases_hierarchical=dict_centroid_phrases_hierarchical)
