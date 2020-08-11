@@ -436,6 +436,7 @@ def get_language():
     dict_from_csv = list(csv.DictReader(open('phrases.csv')))
     print("Changing descrpitpors language")
     current_language = request.form.get('select_language')
+
     if(current_language is None): current_language = "ukrlang"
     print(current_language)
     descriptors = [descr[current_language+'hetmans'] for descr in dict_from_csv]

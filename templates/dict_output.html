@@ -8,13 +8,13 @@
 
 
 K-means classifier
-<form method="post" action="{{url_for('get_language')}}">
+<form method="post" name="select_lang_submission_form" action="{{url_for('get_language')}}">
      <div class="form-group">
         <input type="hidden" name="delete_input"/>
     </div>
 
- <select  type="submit" name="select_language" >
-
+ <select  type="submit" id="select_language" name="select_language" onChange="this.form.submit();" >
+   <option value="init" id="elem_id_language_0">Select language</option>
             <option value="engllang">English</option>
 
             <option value="ukrlang" >Українська</option>
@@ -25,14 +25,14 @@ K-means classifier
         <p>
 
 
-     <button type="submit" class="btn btn-submit" id="btnSignUp">Submit</button>
+
 </form>
 
 
 
         <select name="select_centroid" id="select_centroid">
 
-            <option value="ukrlang" id="elem_id_centroid_0">Select idea</option>
+
 
         </select>
 
@@ -42,7 +42,7 @@ K-means classifier
 
 <select name="select_subcentroid" id="select_subcentroid">
 
-            <option value="ukrlang" id="elem_id_subcentroid_0">Select idea</option>
+
 
         </select>
 

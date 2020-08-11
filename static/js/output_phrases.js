@@ -12,8 +12,8 @@
 
           function get_main_centroids_from_dict (dict){
 
-                  var main_centroids_array = new Array();
-                  var subcentroids_array = new Array();
+                  var descriptors_set = new Set();
+                  var subdescriprotrs_set = new Set();
 
 
                   dict.forEach(function (element){
@@ -26,14 +26,14 @@
 
                           current_subentry = JSON.parse(subelement);
 
-                           subcentroids_array.push(current_subentry["centroid"]);
+                           subdescriprotrs_set.add(current_subentry["centroid"]);
                           // alert("subcentroid " + current_subentry["centroid"])
                       });
 
-                    main_centroids_array.push(current_entry["main_centroid"])
+                    descriptors_set.add(current_entry["main_centroid"])
                   });
 
-                  return [main_centroids_array, subcentroids_array];
+                  return [descriptors_set, subdescriprotrs_set];
             };
 
 
@@ -74,38 +74,15 @@
               console.log("Length var centroid"+var_centroid_phrases.length)
               console.log("Length dict centroid hierarchical"+dict_centroid_phrases_hierarchical.length)
 
-                  // dict_centroid_phrases_hierarchical.forEach(function (entry_element) {
-                  //   console.log("centroids_element_hierarchical");
-                  //   console.log(entry_element);
-                  //   parsed_entry_element = JSON.parse(entry_element)
-                  //   current_centroid = parsed_entry_element["centroid"]
-
-            //     $('#select_centroid_hierarchical').append(`<option value=${current_centroid}>
-            //                            ${current_centroid}
-            //                       </option>`)
-            //
-            //            current_centroid_level2 = parsed_entry_element["subcentroid"]
-            //            $('#select_centroid_hierarchical_level2').append(`<option value=${current_centroid}>
-            //                            ${current_centroid}
-            //                       </option>`)
-            //
-            // });
-
     function get_phrases_according_descriptors(descriptor1, descriptor2, json_arr){
 
          var phrases_str_to_return ="";
 
         json_arr.forEach(function (element) {
-
-
             parsed_element = JSON.parse(element);
             // alert('%'+parsed_element["centroid"].trim()+'%'+ " "+'%'+$('#select_centroid').val()+'%');
             // alert('%'+parsed_element["centroid"].trim()+'%');
             if (descriptor1 == parsed_element["centroid"].trim() && (descriptor2 == parsed_element["centroid"].trim() || descriptor2 == "")) {
-
-
-                // $('#div_ideas').text("Idea:" + parsed_element["centroid"].trim() + "<br/>" + "Related ideas: " + parsed_element["neighbors"]);
-                // $('#div_phrases').text($('#div_phrases').text() + " " + parsed_element["ukrlangphrases"]);
 
                 console.log("ukrlangphrases")
                 console.log(parsed_element["ukrlangphrases"])
@@ -134,8 +111,6 @@
                    // alert('%'+parsed_element["centroid"].trim()+'%');
                    if ($('#select_centroid').val().trim() == parsed_element["centroid"].trim()) {
 
-
-
                        $('#div_ideas').text("Idea:"+parsed_element["centroid"].trim()+"<br/>"+"Related ideas: "+parsed_element["neighbors"]);
 
 
@@ -143,9 +118,6 @@
                     console.log(parsed_element["ukrlangphrases"])
 
                    };
-
-
-
 
                 });
                  $('#div_phrases').text(get_phrases_according_descriptors($('#select_centroid').val().trim(), "", var_centroid_phrases));
@@ -156,8 +128,6 @@
 
                    console.log("$('#select_centroid_hierarchical_level2').val()")
                    console.log($('#select_centroid_hierarchical_level2').val())
-
-
 
                  $('#div_phrases_hierarchical').text(get_phrases_according_descriptors($('#select_centroid_hierarchical_level2').val().trim(), "", dict_centroid_phrases_hierarchical));
              });
