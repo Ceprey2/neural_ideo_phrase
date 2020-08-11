@@ -171,42 +171,24 @@ def hierarchical_clustering(dict_from_csv,current_langugage):
     #print("height 3")
     #print_cut_tree_features(cutree, names)
 
-    labels_ward_1 = fcluster(Z_ward, 2,
+    labeled_rows_by_numbers_ward_level1 = fcluster(Z_ward, 2,
                              criterion='distance')  # LET'S ASSIGN NUMBER ONE TO THE UPPER LEVEL. HEIGT 2 IS HIGHER THAN 1 IN THE TREE
-    # print("ward labels 2")
-    print("111 labels 1")
-    print(set(labels_ward_1))
-
-    labels_ward_2 = fcluster(Z_ward, 1, criterion='distance')
-    #print("ward labels 1")
-
-    print("111 labels 2")
-    print(set(labels_ward_2))
 
 
-    labels_ward_1_named, labels_ward_2_named = transform_labels_to_names(labels_ward_1, labels_ward_2, descriptors)
+    labeled_rows_by_number_ward_level2 = fcluster(Z_ward, 1, criterion='distance')
+
+    labels_ward_1_named, labels_ward_2_named = transform_labels_to_names(labeled_rows_by_numbers_ward_level1, labeled_rows_by_number_ward_level2, descriptors)
 
     pd.set_option('display.max_rows', None)  # TO AVOID TRUNCATING TABLE WHEN PRINTING
     pd.set_option('display.max_columns', 15)
     pd.set_option('display.width', None)
     pd.set_option('display.max_colwidth', 1000)
     df_ward = pd.DataFrame({'phrases': phrases, 'labels2': labels_ward_2_named, 'labels1': labels_ward_1_named})
-    #df_ward = df_ward.sort_values(by='labels1', ascending=False, na_position='first')
+
 
     print("DataFrame of two level labels")
     print(df_ward)
 
-    # Create a DataFrame with labels and varieties as columns: df
-    # df = pd.DataFrame({'labels': labels, 'descriptors': descriptors})
-
-
-    # print("DataFrame of classifyier")
-    # print(df[:20])
-    # Create crosstab: ct
-    #ct = pd.crosstab(df['labels'], df['descriptors'])
-
-    # Display ct
-    #print(ct)
     for lb1 in set(labels_ward_1_named):
         entries = []
         print("label_number")
@@ -233,7 +215,7 @@ def hierarchical_clustering(dict_from_csv,current_langugage):
 
                 }
 
-             entries.append((entry))
+             entries.append(json.dumps(entry))
                 #dict_centroid_phrases_hierarchical = {"main_centroid": "", "entries": entries} # THIS LINE IS FOR COMPARING FORMAT OF RETURNING DICT
 
 
@@ -241,11 +223,14 @@ def hierarchical_clustering(dict_from_csv,current_langugage):
 
         print("Length of hierarchical subcluster")
         print(len(dict_centroid_phrases_hierarchical_subcluster['entries']))
-        print(dict_centroid_phrases_hierarchical_subcluster['main_centroid'])
+        print(dict_centroid_phrases_hierarchical_subcluster["main_centroid"])
         print(dict_centroid_phrases_hierarchical_subcluster['entries'])
 
-        dict_subclusters_array_hierarchical.append(dict_centroid_phrases_hierarchical_subcluster)
+        dict_subclusters_array_hierarchical.append(json.dumps(dict_centroid_phrases_hierarchical_subcluster))
         # print("dict_centroid_phrases_hierarchical_subcluster")
+
+        print("returned hierarchichal dict")
+        print(dict_subclusters_array_hierarchical)
 
     return dict_subclusters_array_hierarchical, labels
 
@@ -257,14 +242,6 @@ def agglomerative_clustering(descriptors):
 
 
     clustering = AgglomerativeClustering().fit(X)
-
-    agglom_labels = clustering.labels_
-
-    # print("agglom_labels")
-    # print(agglom_labels)
-    # print("agglom_labels length")
-    # print(len(agglom_labels))
-
 
 
 def k_means_classifier(descriptors, csv_dict_structured_data):
@@ -419,10 +396,6 @@ def k_means_subclusters_classifier (df_subclusters_list, current_language):
 
         #descriptors.extend(descrs)
         dict_subcluster, labels = k_means_classifier(descriptors_sequences, subcluster)
-
-
-
-
         #print(dict_subcluster)
         dict_subclusters_array.append(json.dumps(dict_subcluster))
 

@@ -1,5 +1,5 @@
           //  var centroids_arr = centroids.split(" ");
-            var centroids_subcentroids = new Array();
+
 
 
             console.log("first element from dict_centroid_phrases|safe")
@@ -10,54 +10,86 @@
               console.log(parsed_centroid_phrases["main_centroid"])
             console.log("centroids centroids_arr")
 
-            function parse_k_means_dict(var_centroid_phrases){
+          function get_main_centroids_from_dict (dict){
+
+                  var main_centroids_array = new Array();
+                  var subcentroids_array = new Array();
 
 
+                  dict.forEach(function (element){
 
-
-                  var_centroid_phrases.forEach(function (element){
+                      //alert(element);
 
                       current_entry = JSON.parse(element);
 
-                    centroids_subcentroids.push(current_entry["main_centroid"])
+                      current_entry['entries'].forEach(function (subelement){
+
+                          current_subentry = JSON.parse(subelement);
+
+                           subcentroids_array.push(current_subentry["centroid"]);
+                          // alert("subcentroid " + current_subentry["centroid"])
+                      });
+
+                    main_centroids_array.push(current_entry["main_centroid"])
                   });
+
+                  return [main_centroids_array, subcentroids_array];
             };
 
-              parse_k_means_dict(var_centroid_phrases);
-
-              alert(centroids_subcentroids);
 
 
+              var centroids_subcentroids_k_means = get_main_centroids_from_dict(var_centroid_phrases);
 
-            var_centroid_phrases.forEach(function (entry_element) {
-                    console.log("centroids_element");
-                    console.log(entry_element);
-                    parsed_entry_element = JSON.parse(entry_element)
-                    current_centroid = parsed_entry_element["main_centroid"]
-                $('#select_centroid').append(`<option value=${current_centroid}>
-                                       ${current_centroid}
+              alert(centroids_subcentroids_k_means);
+
+
+
+     var centroids_subcentroids_hierarchical = get_main_centroids_from_dict(dict_centroid_phrases_hierarchical);
+
+              alert(centroids_subcentroids_hierarchical);
+
+              function append_descriptors_to_select (select_id, descriprors_array){
+
+
+                  descriprors_array.forEach(function (current_descriptor) {
+
+
+
+
+                $('#'+select_id).append(`<option value=${current_descriptor}>
+                                       ${current_descriptor}
                                   </option>`)
 
             });
+
+
+
+              }
+            append_descriptors_to_select ("select_centroid", centroids_subcentroids_k_means[0]);
+            append_descriptors_to_select ("select_subcentroid", centroids_subcentroids_k_means[1]);
+
+              append_descriptors_to_select ("select_centroid_hierarchical", centroids_subcentroids_hierarchical[0]);
+              append_descriptors_to_select ("select_centroid_hierarchical_level2", centroids_subcentroids_hierarchical[1]);
 
               console.log("Length var centroid"+var_centroid_phrases.length)
-              console.log("Length dict centroid"+dict_centroid_phrases_hierarchical.length)
+              console.log("Length dict centroid hierarchical"+dict_centroid_phrases_hierarchical.length)
 
-                  dict_centroid_phrases_hierarchical.forEach(function (entry_element) {
-                    console.log("centroids_element_hierarchical");
-                    console.log(entry_element);
-                    parsed_entry_element = JSON.parse(entry_element)
-                    current_centroid = parsed_entry_element["centroid"]
-                $('#select_centroid_hierarchical').append(`<option value=${current_centroid}>
-                                       ${current_centroid}
-                                  </option>`)
+                  // dict_centroid_phrases_hierarchical.forEach(function (entry_element) {
+                  //   console.log("centroids_element_hierarchical");
+                  //   console.log(entry_element);
+                  //   parsed_entry_element = JSON.parse(entry_element)
+                  //   current_centroid = parsed_entry_element["centroid"]
 
-                       current_centroid_level2 = parsed_entry_element["subcentroid"]
-                       $('#select_centroid_hierarchical_level2').append(`<option value=${current_centroid}>
-                                       ${current_centroid}
-                                  </option>`)
-
-            });
+            //     $('#select_centroid_hierarchical').append(`<option value=${current_centroid}>
+            //                            ${current_centroid}
+            //                       </option>`)
+            //
+            //            current_centroid_level2 = parsed_entry_element["subcentroid"]
+            //            $('#select_centroid_hierarchical_level2').append(`<option value=${current_centroid}>
+            //                            ${current_centroid}
+            //                       </option>`)
+            //
+            // });
 
     function get_phrases_according_descriptors(descriptor1, descriptor2, json_arr){
 
