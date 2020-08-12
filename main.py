@@ -12,7 +12,7 @@ from scipy.spatial.distance import pdist
 from sklearn.cluster import KMeans
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-number_of_clusters = 3
+
 
 
 
@@ -185,9 +185,21 @@ def hierarchical_clustering(dict_from_csv,current_langugage):
     pd.set_option('display.max_colwidth', 1000)
     df_ward = pd.DataFrame({'phrases': phrases, 'labels2': labels_ward_2_named, 'labels1': labels_ward_1_named})
 
+    df_ward_labels2_phrases = pd.DataFrame({'labels2': labels_ward_2_named, 'phrases': phrases }).groupby('labels2').agg('-'.join)
+    df_ward_labels1_labels2 = pd.DataFrame({'labels1': phrases, 'labels2': labels_ward_2_named }).groupby('labels1').agg('-'.join)
+
+
+
 
     print("DataFrame of two level labels")
     print(df_ward)
+
+    df_ward_grouped = df_ward.groupby(['labels1', 'labels2']).agg('-'.join)
+
+    print("df_ward_grouped")
+    print(df_ward.keys())
+
+
 
     for lb1 in set(labels_ward_1_named):
         entries = []
@@ -221,18 +233,23 @@ def hierarchical_clustering(dict_from_csv,current_langugage):
 
         dict_centroid_phrases_hierarchical_subcluster["entries"] = entries
 
-        print("Length of hierarchical subcluster")
-        print(len(dict_centroid_phrases_hierarchical_subcluster['entries']))
-        print(dict_centroid_phrases_hierarchical_subcluster["main_centroid"])
-        print(dict_centroid_phrases_hierarchical_subcluster['entries'])
+        # print("Length of hierarchical subcluster")
+        # print(len(dict_centroid_phrases_hierarchical_subcluster['entries']))
+        # print(dict_centroid_phrases_hierarchical_subcluster["main_centroid"])
+        # print(dict_centroid_phrases_hierarchical_subcluster['entries'])
 
         dict_subclusters_array_hierarchical.append(json.dumps(dict_centroid_phrases_hierarchical_subcluster))
         # print("dict_centroid_phrases_hierarchical_subcluster")
 
-        print("returned hierarchichal dict")
-        print(dict_subclusters_array_hierarchical)
+        # print("returned hierarchichal dict")
+        # print(dict_subclusters_array_hierarchical)
 
-    return dict_subclusters_array_hierarchical, labels
+    # print("df_ward.to_json()")
+    # print(df_ward.to_json())
+    print("df_ward.to_json()")
+    print(df_ward_labels2_phrases.to_json(orient='records'))
+
+    return df_ward_labels2_phrases.to_json(orient='records'), df_ward_labels1_labels2
 
 
 def agglomerative_clustering(descriptors):
@@ -275,10 +292,10 @@ def k_means_classifier(descriptors, csv_dict_structured_data):
         model.fit(X)
         inertias.append(model.inertia_)
 
-    try:
-        draw_classifier_plot(rng, inertias)
-    except:
-        print('Plotting error')
+    # try:
+    #     draw_classifier_plot(rng, inertias)
+    # except:
+    #     print('Plotting error')
 
     # plt.scatter(X,y_kmeans, c=y_kmeans, s=50, cmap='viridis')
     # wcss.append(model.inertia_)
@@ -307,6 +324,132 @@ def k_means_classifier(descriptors, csv_dict_structured_data):
     print((model.labels_))
     print("model.labels_ LENGHT")
     print(len((model.labels_)))
+
+    all_centroids = []
+    for current_cluster in range(len(set(labels))):  # iterates over all unique clusters
+        current_neighbors = []
+        #print("Synonymicgroup %d:" % i),
+
+        current_centroid = terms[order_centroids[current_cluster, :1][0]]
+        all_centroids.append(current_centroid)
+        print("Cluster %d:" % current_cluster),
+        datapoinst_to_print = 25
+        for ind in order_centroids[current_cluster, :datapoinst_to_print]:
+            current_neighbors.append(terms[ind])
+            # print(terms[ind])
+
+        # print("current_centroid")  # searching for centroids amongst descriptors
+        # print(current_centroid)  # searching for centroids amongst descriptors
+        for row_number in range(len(csv_dict_structured_data)):
+            # print("rows length", len(csv_dict_structured_data))
+            # print("labels length", len(labels))
+            if ((current_cluster == labels[row_number])):
+                # print("df_structured_data[\"ukrlang\"]")
+                #print(df_structured_data["ukrlang"])
+                print("k =", row_number)
+                #print(df_structured_data[k])
+                #entries_to_output.append(df_structured_data[k])
+                entry = {
+                    "centroid": current_centroid,
+                    "subcentroid": current_neighbors,
+                    "ukrlangphrases": df_structured_data["ukrlang"][row_number],
+                    "spanlangphrases": df_structured_data["spanishlang"][row_number],
+                    "engllangphrases": df_structured_data["engllang"][row_number],
+                    "frenchlangphrases": df_structured_data["frenchlang"][row_number],
+                    "itallangphrases": df_structured_data["itallang"][row_number],
+                    "latinlangphrases": df_structured_data["latinlang"][row_number],
+                    "ruslangphrases": df_structured_data["ruslang"][row_number],
+                    "hebrlangphrases": df_structured_data["hebrlang"][row_number]
+
+                }
+
+                entries.append(json.dumps(entry))
+
+    print("all_centroids")
+    print(all_centroids)
+
+        #print("current neighbors")
+        #print(current_neighbors)
+
+    dict_centroid_phrases["main_centroid"] = max(set(all_centroids), key=all_centroids.count)
+    print("dict_centroid_phrases[\"main_centroid\"]")
+    print(dict_centroid_phrases["main_centroid"])
+    dict_centroid_phrases["entries"] = entries
+    return dict_centroid_phrases, labels
+
+
+def k_means_two_level_classifier(descriptors, csv_dict_structured_data):
+    print("Two level working")
+    number_or_subclusters = 49
+    rng = range(number_or_subclusters-1,number_or_subclusters)
+    inertias = []
+
+    # print("type(csv_structured_data)")
+    # print(type(csv_structured_data))
+    df_structured_data = pd.DataFrame(csv_dict_structured_data) #converting ordered dict to dataframe
+    # print("Recieved df_structured_data")
+    # print(df_structured_data)
+    # print("Recieved descritptors")
+    # print(descriptors)
+    df_structured_data.fillna('null', inplace=True) # replacing Nan cells with null for js to understand during json parsing
+
+    entries = []
+    dict_centroid_phrases = {"main_centroid": "", "entries": entries }
+    tfidf = TfidfVectorizer(token_pattern=r"(?u)\b\w+'?\w+\b")
+    X = tfidf.fit_transform(descriptors)
+    # print("X tipe of vectorizer")
+    # print(type(X))
+    # print("X.shape of transformed data")
+    # print(X.shape)
+    # print("Elements 1 transformed")
+    # print(X[1])
+    # print("Elements 5 transformed")
+    # print(X[6])
+    for k in rng:
+        model = KMeans(n_clusters=k, random_state=17)
+        model.fit(X)
+        inertias.append(model.inertia_)
+
+    # try:
+    #     draw_classifier_plot(rng, inertias)
+    # except:
+    #     print('Plotting error')
+
+    # plt.scatter(X,y_kmeans, c=y_kmeans, s=50, cmap='viridis')
+    # wcss.append(model.inertia_)
+    # plt.plot(range(1, 1), wcss)
+    # plt.title('The Elbow Method Graph')
+    # plt.xlabel('Number of clusters')
+    # plt.ylabel('WCSS')
+    # plt.show()
+    # print(model.labels_)
+    # print(len(model.labels_))
+
+    # print(X.shape)
+    # print(len(features_descriptors))
+    # print("model.verbose")
+    # print(model.verbose)
+    order_centroids = model.cluster_centers_.argsort()[:, ::-1]
+    terms = tfidf.get_feature_names()
+    # print(len(terms))
+
+    # phrase_numbers = model.cluster_centers_
+    # print(phrase_numbers)
+    #print(tfidf.decode(phrase_numbers[0]))
+
+    labels = model.labels_  # the model assigns as many labels as rows are in the table
+    print("k_means model.labels_ set")
+    print(set(labels))
+    print("model.labels_ LENGHT")
+    print(len((model.labels_)))
+
+    named_labels = [terms[order_centroids[label, :1][0]] for label in labels]
+
+    df_k_means_cluster = pd.DataFrame({"phrases": df_structured_data['ukrlang'], "descriptors": df_structured_data['ukrlanghetmans'], "labels1": named_labels}).groupby('labels1').agg(','.join)
+
+    print("First level df_k_means_cluster")
+    print(df_k_means_cluster)
+
 
     all_centroids = []
     for current_cluster in range(len(set(labels))):  # iterates over all unique clusters
@@ -394,10 +537,12 @@ def k_means_subclusters_classifier (df_subclusters_list, current_language):
             descr_sequence = entry[current_language+'hetmans'].replace("*", "").strip().lower() # TODO: Perform this normalizing before, for example, in CSV file
             descriptors_sequences.append(descr_sequence)# There should be as many sequences as rows (entries) in subcluster
 
-        #descriptors.extend(descrs)
+
         dict_subcluster, labels = k_means_classifier(descriptors_sequences, subcluster)
-        #print(dict_subcluster)
+
         dict_subclusters_array.append(json.dumps(dict_subcluster))
+    print("dict_k_means type")
+    print(type(dict_subclusters_array))
 
     return dict_subclusters_array
 
@@ -415,12 +560,13 @@ def main():
     descriptors = [descr[current_language + 'hetmans'] for descr in dict_from_csv]
     dict_centroid_phrases, labels = k_means_classifier(descriptors, dict_from_csv)
     subclusters_dict = get_k_means_subclusters_array(dict_from_csv, labels)
+    a, b = k_means_two_level_classifier(descriptors, dict_from_csv)
     dict_subcluster_phrases = k_means_subclusters_classifier(subclusters_dict, current_language)
 
-    dict_centroid_phrases_hierarchical, labels2 = hierarchical_clustering(dict_from_csv, current_language)
+    json_subdescriptors_phrases_hierarchical, json_descriptors_subdescriptors_hierarchical = hierarchical_clustering(dict_from_csv, current_language)
     return render_template('dict_output.html',
                            dict_centroid_phrases=dict_subcluster_phrases,
-                           dict_centroid_phrases_hierarchical=dict_centroid_phrases_hierarchical)
+                           dict_centroid_phrases_hierarchical=json_subdescriptors_phrases_hierarchical, json_descriptors_subdescriptors_hierarchical=json_descriptors_subdescriptors_hierarchical)
 
 def draw_classifier_plot(rng, inertias):
     plt.plot(rng, inertias, '-o')
@@ -441,10 +587,12 @@ def get_language():
     print(current_language)
     descriptors = [descr[current_language+'hetmans'] for descr in dict_from_csv]
     dict_centroid_phrases, labels = k_means_classifier(descriptors, dict_from_csv)
+
     subclusters_dict = get_k_means_subclusters_array(dict_from_csv, labels)
     dict_subcluster_phrases = k_means_subclusters_classifier(subclusters_dict, current_language)
 
     dict_centroid_phrases_hierarchical, labels2 = hierarchical_clustering(dict_from_csv, current_language)
+
     return render_template('dict_output.html',
                            dict_centroid_phrases=dict_subcluster_phrases,
                            dict_centroid_phrases_hierarchical=dict_centroid_phrases_hierarchical)

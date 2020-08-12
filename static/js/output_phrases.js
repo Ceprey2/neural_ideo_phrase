@@ -41,6 +41,7 @@
               var centroids_subcentroids_k_means = get_main_centroids_from_dict(var_centroid_phrases);
 
               alert(centroids_subcentroids_k_means);
+              alert((dict_centroid_phrases_hierarchical[1]["phrases"]));
 
 
 
@@ -122,6 +123,11 @@
                 });
                  $('#div_phrases').text(get_phrases_according_descriptors($('#select_centroid').val().trim(), "", var_centroid_phrases));
              });
+
+
+
+
+
 
 
     $('#select_centroid_hierarchical_level2').change(function () {
