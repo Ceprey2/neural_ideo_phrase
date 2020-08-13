@@ -378,15 +378,17 @@ def k_means_classifier(descriptors, csv_dict_structured_data):
     return dict_centroid_phrases, labels
 
 
-def k_means_two_level_classifier(descriptors, csv_dict_structured_data):
+def k_means_levelled(csv_dict_structured_data, current_language, level, number_or_subclusters):
     print("Two level working")
-    number_or_subclusters = 49
+
     rng = range(number_or_subclusters-1,number_or_subclusters)
     inertias = []
 
     # print("type(csv_structured_data)")
     # print(type(csv_structured_data))
     df_structured_data = pd.DataFrame(csv_dict_structured_data) #converting ordered dict to dataframe
+    descriptors = df_structured_data[current_language+'hetmans']
+
     # print("Recieved df_structured_data")
     # print(df_structured_data)
     # print("Recieved descritptors")
@@ -445,63 +447,51 @@ def k_means_two_level_classifier(descriptors, csv_dict_structured_data):
 
     named_labels = [terms[order_centroids[label, :1][0]] for label in labels]
 
-    df_k_means_cluster = pd.DataFrame({"phrases": df_structured_data['ukrlang'], "descriptors": df_structured_data['ukrlanghetmans'], "labels1": named_labels}).groupby('labels1').agg(','.join)
+    print("df_structured_data.keys()")
+    print(df_structured_data.keys())
 
-    print("First level df_k_means_cluster")
-    print(df_k_means_cluster)
+    if (level == "1"):
 
 
-    all_centroids = []
-    for current_cluster in range(len(set(labels))):  # iterates over all unique clusters
-        current_neighbors = []
-        #print("Synonymicgroup %d:" % i),
+        df_k_means_clusters = pd.DataFrame({"ukrlang": df_structured_data['ukrlang'], "hetmans": df_structured_data[current_language+'hetmans'],
+                                            "curr_lev_labels"+level: named_labels, "first_level_labels": named_labels}).groupby('curr_lev_labels'+level).agg(','.join)
 
-        current_centroid = terms[order_centroids[current_cluster, :1][0]]
-        all_centroids.append(current_centroid)
-        print("Cluster %d:" % current_cluster),
-        datapoinst_to_print = 25
-        for ind in order_centroids[current_cluster, :datapoinst_to_print]:
-            current_neighbors.append(terms[ind])
-            # print(terms[ind])
+        df_k_means_clusters["first_level_labels"] = df_k_means_clusters.index
+    if (level == "2"):
+        # df_temp = pd.DataFrame(
+        #     { "first_level_labels": df_structured_data["first_level_labels"], "ukrlang": df_structured_data['ukrlang'], "hetmans": df_structured_data[current_language + 'hetmans'],
+        #      "curr_lev_labels" + level: named_labels}).groupby("first_level_labels" ).agg(','.join)
+        # print("temp")
+        # print(df_temp)
+        df_k_means_clusters = pd.DataFrame(
+            { "first_level_labels": df_structured_data["first_level_labels"], "ukrlang": df_structured_data['ukrlang'], "hetmans": df_structured_data[current_language + 'hetmans'],
+             "curr_lev_labels" + level: named_labels}).groupby('curr_lev_labels' + level).agg(','.join)
 
-        # print("current_centroid")  # searching for centroids amongst descriptors
-        # print(current_centroid)  # searching for centroids amongst descriptors
-        for row_number in range(len(csv_dict_structured_data)):
-            # print("rows length", len(csv_dict_structured_data))
-            # print("labels length", len(labels))
-            if ((current_cluster == labels[row_number])):
-                # print("df_structured_data[\"ukrlang\"]")
-                #print(df_structured_data["ukrlang"])
-                print("k =", row_number)
-                #print(df_structured_data[k])
-                #entries_to_output.append(df_structured_data[k])
-                entry = {
-                    "centroid": current_centroid,
-                    "subcentroid": current_neighbors,
-                    "ukrlangphrases": df_structured_data["ukrlang"][row_number],
-                    "spanlangphrases": df_structured_data["spanishlang"][row_number],
-                    "engllangphrases": df_structured_data["engllang"][row_number],
-                    "frenchlangphrases": df_structured_data["frenchlang"][row_number],
-                    "itallangphrases": df_structured_data["itallang"][row_number],
-                    "latinlangphrases": df_structured_data["latinlang"][row_number],
-                    "ruslangphrases": df_structured_data["ruslang"][row_number],
-                    "hebrlangphrases": df_structured_data["hebrlang"][row_number]
+    # "centroid": current_centroid,
+    # "subcentroid": current_neighbors,
+    # "ukrlangphrases": df_structured_data["ukrlang"][row_number],
+    # "spanlangphrases": df_structured_data["spanishlang"][row_number],
+    # "engllangphrases": df_structured_data["engllang"][row_number],
+    # "frenchlangphrases": df_structured_data["frenchlang"][row_number],
+    # "itallangphrases": df_structured_data["itallang"][row_number],
+    # "latinlangphrases": df_structured_data["latinlang"][row_number],
+    # "ruslangphrases": df_structured_data["ruslang"][row_number],
+    # "hebrlangphrases": df_structured_data["hebrlang"][row_number]
 
-                }
+    pd.set_option('display.max_rows', None)  # TO AVOID TRUNCATING TABLE WHEN PRINTING
+    pd.set_option('display.max_columns', 15)
+    pd.set_option('display.width', None)
+    pd.set_option('display.max_colwidth', 1000)
 
-                entries.append(json.dumps(entry))
 
-    print("all_centroids")
-    print(all_centroids)
 
-        #print("current neighbors")
-        #print(current_neighbors)
+    print("Current level df_k_means_cluster: " +level)
+    print(df_k_means_clusters)
+    print(df_k_means_clusters.index)
 
-    dict_centroid_phrases["main_centroid"] = max(set(all_centroids), key=all_centroids.count)
-    print("dict_centroid_phrases[\"main_centroid\"]")
-    print(dict_centroid_phrases["main_centroid"])
-    dict_centroid_phrases["entries"] = entries
-    return dict_centroid_phrases, labels
+
+
+    return df_k_means_clusters
 
 
 def get_k_means_subclusters_array (csv_structured_data, labels):
@@ -560,7 +550,8 @@ def main():
     descriptors = [descr[current_language + 'hetmans'] for descr in dict_from_csv]
     dict_centroid_phrases, labels = k_means_classifier(descriptors, dict_from_csv)
     subclusters_dict = get_k_means_subclusters_array(dict_from_csv, labels)
-    a, b = k_means_two_level_classifier(descriptors, dict_from_csv)
+    df_kmeans_clusters1= k_means_levelled(dict_from_csv, current_language, "1", 48)
+    df_kmeans_clusters2= k_means_levelled(df_kmeans_clusters1, "", "2", 4)
     dict_subcluster_phrases = k_means_subclusters_classifier(subclusters_dict, current_language)
 
     json_subdescriptors_phrases_hierarchical, json_descriptors_subdescriptors_hierarchical = hierarchical_clustering(dict_from_csv, current_language)
