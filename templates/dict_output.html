@@ -30,7 +30,7 @@ K-means classifier
 
 
 
-        <select name="select_centroid" id="select_centroid">
+        <select name="select_descriptor_k_means" id="select_descriptor_k_means">
 
 
 
@@ -38,9 +38,9 @@ K-means classifier
 
 
 
-        <label for= "select_centroid" id = "labl_select_centroid" > Select a descriptor</label>
+        <label for= "select_descriptor_k_means" id = "labl_select_centroid" > Select a descriptor</label>
 
-<select name="select_subcentroid" id="select_subcentroid">
+<select name="select_subdescriptor_k_means" id="select_subdescriptor_k_means">
 
 
 
@@ -48,7 +48,7 @@ K-means classifier
 
 
 
-        <label for= "selectLang" id = "labl_select_subcentroid" > Select a subdescriptor</label>
+
 
 
             </p>
@@ -74,21 +74,21 @@ K-means classifier
 
 Hierarchical spicy classifier
 
-   <select name="select_centroid_hierarchical" id="select_centroid_hierarchical">
+   <select name="select_descriptor_hierarchical" id="select_descriptor_hierarchical">
 
             <option value="centroids" id="elemId_0_hierarch">Select idea</option>
 
         </select>
-<label for= "select_centroid_hierarchical" id = "lab_select_hiererchical" > Select descriptor
+<label for= "select_descriptor_hierarchical" id = "lab_select_hiererchical" > Select descriptor
         languages </label>
 
-  <select name="select_centroid_hierarchical" id="select_centroid_hierarchical_level2">
+  <select name="select_subdescriptors_hierarchical" id="select_subdescriptors_hierarchical">
 
             <option value="centroids" id="elemId_0_hierarch_lev2">Select idea</option>
 
         </select>
 
-<label for= "select_centroid_hierarchical_level2" id = "lab_select_hiererchical_lev2" > Select subdescriptor
+<label for= "select_subdescriptors_hierarchical" id = "lab_select_hiererchical_lev2" > Select subdescriptor
         languages </label>
 
 
@@ -149,14 +149,12 @@ Hierarchical spicy classifier
 
              <script type=text/javascript>
 
-                  var var_centroid_phrases = {{dict_centroid_phrases|safe}};
-                  var dict_centroid_phrases_hierarchical = {{dict_centroid_phrases_hierarchical|safe}};
+                  var json_subdescriptors_phrases_k_means = {{df_kmeans_subdescriptors_phrases|safe}};
+                  var json_descriptors_subdescriptors_k_means = {{k_means_descriptors_subdescriptors|safe}};
+                  var json_subdescriptors_phrases_hierarchical = {{json_subdescriptors_phrases_hierarchical|safe}};
+                  var json_descriptors_subdescriptors_hierarchical = {{json_descriptors_subdescriptors_hierarchical|safe}};
 
-
-
-
-
-                 </script>
+                </script>
 
             <script src="static/js/output_phrases.js"></script>
 
