@@ -66,11 +66,6 @@ def transform_labels_to_names(labels_ward_1, labels_ward_2, descriptors):
 
 
 def hierarchical_clustering(dict_from_csv,current_langugage):
-    dict_subclusters_array_hierarchical = []
-
-    wcss = []
-    entries = []
-
 
     df_dict_from_csv = pd.DataFrame(dict_from_csv)
     descriptors = df_dict_from_csv[current_langugage+'hetmans']
@@ -199,58 +194,11 @@ def hierarchical_clustering(dict_from_csv,current_langugage):
     print("df_ward_labels1_labels2")
     print(df_ward_labels1_labels2)
 
-    df_ward_grouped = df_ward.groupby(['labels1', 'labels2']).agg('-'.join)
+
 
     print("df_ward_grouped")
     print(df_ward.keys())
 
-
-
-    for lb1 in set(labels_ward_1_named):
-        entries = []
-        print("label_number")
-        print(lb1)
-
-        dict_centroid_phrases_hierarchical_subcluster = {"main_centroid": lb1,
-                                                         "entries": entries}
-
-        for row_number in range(len(dict_from_csv)):
-
-
-            if ((lb1 == labels_ward_1_named[row_number])):
-             entry = {
-                        "centroid": labels_ward_2_named[row_number],
-
-                        "ukrlangphrases": df_dict_from_csv["ukrlang"][row_number],
-                        "spanlangphrases": df_dict_from_csv["spanishlang"][row_number],
-                        "engllangphrases": df_dict_from_csv["engllang"][row_number],
-                        "frenchlangphrases": df_dict_from_csv["frenchlang"][row_number],
-                        "itallangphrases": df_dict_from_csv["itallang"][row_number],
-                        "latinlangphrases": df_dict_from_csv["latinlang"][row_number],
-                        "ruslangphrases": df_dict_from_csv["ruslang"][row_number],
-                        "hebrlangphrases": df_dict_from_csv["hebrlang"][row_number]
-
-                }
-
-             entries.append(json.dumps(entry))
-                #dict_centroid_phrases_hierarchical = {"main_centroid": "", "entries": entries} # THIS LINE IS FOR COMPARING FORMAT OF RETURNING DICT
-
-
-        dict_centroid_phrases_hierarchical_subcluster["entries"] = entries
-
-        # print("Length of hierarchical subcluster")
-        # print(len(dict_centroid_phrases_hierarchical_subcluster['entries']))
-        # print(dict_centroid_phrases_hierarchical_subcluster["main_centroid"])
-        # print(dict_centroid_phrases_hierarchical_subcluster['entries'])
-
-        dict_subclusters_array_hierarchical.append(json.dumps(dict_centroid_phrases_hierarchical_subcluster))
-        # print("dict_centroid_phrases_hierarchical_subcluster")
-
-        # print("returned hierarchichal dict")
-        # print(dict_subclusters_array_hierarchical)
-
-    # print("df_ward.to_json()")
-    # print(df_ward.to_json())
     print("df_ward.to_json()")
     print(df_ward_labels2_phrases.to_json(orient='records'))
 
@@ -298,8 +246,19 @@ def k_means_subclusters_phrases(csv_dict_structured_data, current_language, numb
     # print("df_structured_data.keys()")
     # print(df_structured_data.keys())
 
-    df_k_means_clusters = pd.DataFrame({"phrases": df_structured_data[current_language], "hetmans": df_structured_data[current_language+'hetmans'],
-                                            "subdescriptors": named_labels, "subclusters": named_labels}).groupby('subdescriptors').agg(','.join)
+    df_k_means_clusters = pd.DataFrame({
+                                     "ukrlang": df_structured_data["ukrlang"],
+                                                    "engllang": df_structured_data["engllang"],
+                                                    "spanishlang": df_structured_data["spanishlang"],
+                                                    "frenchlang": df_structured_data["frenchlang"],
+                                                    "itallang": df_structured_data["itallang"],
+                                                    "ruslang": df_structured_data["ruslang"],
+                                                    "latinlang": df_structured_data["latinlang"],
+                                                    "hebrlang": df_structured_data["hebrlang"],
+                                        "hetmans": df_structured_data[current_language+'hetmans'],
+                                         "subdescriptors": named_labels,
+                                        "subclusters": named_labels
+                                        }).groupby('subdescriptors').agg(','.join)
 
     df_k_means_clusters["subclusters"] = df_k_means_clusters.index
 
@@ -321,9 +280,6 @@ def k_means_subclusters_phrases(csv_dict_structured_data, current_language, numb
     pd.set_option('display.max_columns', 15)
     pd.set_option('display.width', None)
     pd.set_option('display.max_colwidth', 1000)
-
-
-
     print("Current level df_k_means_cluster: ")
     print(df_k_means_clusters)
     print(df_k_means_clusters.index)
@@ -395,13 +351,10 @@ def k_means_subclusters_descriptors(csv_dict_structured_data, current_language, 
     return df_k_means_clusters.to_json(orient='records')
 
 
-
-
-
 app = Flask(__name__)
 @app.route('/')
 def main():
-    dict_from_csv = list(csv.DictReader(open('phrases.csv')))
+    dict_from_csv = list(csv.DictReader(open('all_phrases.csv')))
 
     current_language = "ukrlang"
 
@@ -409,7 +362,7 @@ def main():
 
     df_kmeans_subdescriptors_phrases = k_means_subclusters_phrases(dict_from_csv, current_language,  48)
     k_means_descriptors_subdescriptors = k_means_subclusters_descriptors(df_kmeans_subdescriptors_phrases, current_language, 10)
-    #dict_subcluster_phrases = k_means_subclusters_classifier(subclusters_dict, current_language)
+
 
     json_subdescriptors_phrases_hierarchical, json_descriptors_subdescriptors_hierarchical = hierarchical_clustering(dict_from_csv, current_language)
     return render_template('dict_output.html',
