@@ -31,14 +31,24 @@ def get_centroid_feature_for_cluster(descriptors):
 
     for descrs in descriptors:
        list_descriptors.extend(descrs.split())
+       if ('' in list_descriptors):
 
-    all_normalized_descriptors = [ds.replace("*", "").strip().lower() for ds in list_descriptors]
+            print("empty descriptor found in in list_descriptors")
+
+
+    all_normalized_descriptors = [ds.strip().replace("*", "").lower() for ds in list_descriptors if len(ds) > 1]
+
+    #all_normalized_descriptors = sorted(list(filter(''.__ne__, all_normalized_descriptors))) # removing empty '' words
+
+    print("all_normalized_descriptors")
+    print(all_normalized_descriptors)
 
     if (len (all_normalized_descriptors)) > 0:
 
         return max(set(all_normalized_descriptors), key=all_normalized_descriptors.count) # searching for mode
 
-    else:
+    else:qqq
+
         return 'empty_center'
 
 
@@ -135,7 +145,7 @@ def hierarchical_clustering(dict_from_csv,current_langugage):
                )
     plt.show()
 
-    labels = sch.fcluster(mergings, 1, criterion='distance')
+    #labels = sch.fcluster(mergings, 1, criterion='distance')
     # print("mergings t=10 labels", labels)
     #
     # print("mergings shape")
@@ -172,8 +182,15 @@ def hierarchical_clustering(dict_from_csv,current_langugage):
 
     labeled_rows_by_number_ward_level2 = fcluster(Z_ward, 1, criterion='distance')
 
+    print("labeled_rows_by_number_ward_level2")
+    print(labeled_rows_by_number_ward_level2)
+
     labels_ward_1_named, labels_ward_2_named = transform_labels_to_names(labeled_rows_by_numbers_ward_level1, labeled_rows_by_number_ward_level2, descriptors)
 
+    print("labels_ward_1_named")
+    print(labels_ward_1_named)
+    print("labels_ward_2_named")
+    print(labels_ward_2_named)
     pd.set_option('display.max_rows', None)  # TO AVOID TRUNCATING TABLE WHEN PRINTING
     pd.set_option('display.max_columns', 15)
     pd.set_option('display.width', None)
@@ -193,6 +210,8 @@ def hierarchical_clustering(dict_from_csv,current_langugage):
 
     print("df_ward_labels1_labels2")
     print(df_ward_labels1_labels2)
+    print("df_ward_labels2_phrases")
+    print(df_ward_labels2_phrases)
 
 
 
@@ -354,7 +373,7 @@ def k_means_subclusters_descriptors(csv_dict_structured_data, current_language, 
 app = Flask(__name__)
 @app.route('/')
 def main():
-    dict_from_csv = list(csv.DictReader(open('all_phrases.csv')))
+    dict_from_csv = list(csv.DictReader(open('phrases.csv')))
 
     current_language = "ukrlang"
 
