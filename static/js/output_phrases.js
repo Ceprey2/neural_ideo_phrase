@@ -97,7 +97,7 @@ function get_phrases_according_descriptors(descriptor, subdescriptor, json_descr
                                 }
                                 if (element_sub_phr[lang] != null && element_sub_phr[lang].trim()) { // mentioning object means, it has a value, it is not null neither empty string
 
-                                    phrases_str_to_return.push(element_sub_phr[lang]);
+                                    phrases_str_to_return.push(element_sub_phr[lang]+'#');
                                 }
 
 
@@ -108,7 +108,7 @@ function get_phrases_according_descriptors(descriptor, subdescriptor, json_descr
 
                             if (element_sub_phr[lang] != null && element_sub_phr[lang].trim()) { // mentioning object means, it has a value, it is not null neither empty string
 
-                                phrases_str_to_return.push(element_sub_phr[lang]);
+                                phrases_str_to_return.push(element_sub_phr[lang]+'#');
                             }
 
                         }
@@ -166,4 +166,9 @@ $('#select_subdescriptor_k_means').change(function () {
     $('#div_phrases_k_means').html(get_phrases_according_descriptors(descriptor_k_means.val().trim(), $('#select_subdescriptor_k_means').val().trim(), json_descriptors_subdescriptors_hierarchical, json_subdescriptors_phrases_k_means));  // TODO: create an output function
 });
 
-
+$('#btn_clear').click(function (){
+    $('#div_phrases_k_means').text("");
+    $('#div_ideas_hierarchical').text("");
+    $('#div_phrases_hierarchical').text("");
+    $('#div_ideas_k_means').text("");
+});
