@@ -31,26 +31,20 @@ K-means classifier
 
 
         <select name="select_descriptor_k_means" id="select_descriptor_k_means">
-  <option value="centroids" id="elemId_0_k_means">Select idea</option>
+  <option value="centroids" id="elemId_0_k_means">Select descriptor</option>
 
 
         </select>
 
 
 
-        <label for= "select_descriptor_k_means" id = "labl_select_centroid" > Select a descriptor</label>
+        <label for= "select_descriptor_k_means" id = "labl_select_centroid" >Select descriptor</label>
 
 <select name="select_subdescriptor_k_means" id="select_subdescriptor_k_means">
 
-  <option value="centroids" id="elemId_1_k_means">Select idea</option>
+  <option value="centroids" id="elemId_1_k_means">Select subdescriptor</option>
 
         </select>
-
-
-
-
-
-
             </p>
 
 
@@ -58,12 +52,13 @@ K-means classifier
 
 <table style="width:100%">
        <tr>
-      <div id="div_ideas" class="centralDiv">
+      <div id="div_ideas_k_means" class="centralDiv">
 
           </div>
+             <BR/>
   </tr>
   <tr>
-    <div id="div_phrases" class="centralDiv">
+    <div id="div_phrases_k_means" class="centralDiv">
 
         </div>
   </tr>
@@ -76,38 +71,27 @@ Hierarchical spicy classifier
 
    <select name="select_descriptor_hierarchical" id="select_descriptor_hierarchical">
 
-            <option value="centroids" id="elemId_0_hierarch">Select idea</option>
+            <option value="centroids" id="elemId_0_hierarch">Select descriptor</option>
 
         </select>
-<label for= "select_descriptor_hierarchical" id = "lab_select_hiererchical" > Select descriptor
-        languages </label>
+<label for= "select_descriptor_hierarchical" id = "lab_select_hiererchical">Select descriptor</label>
 
   <select name="select_subdescriptors_hierarchical" id="select_subdescriptors_hierarchical">
 
-            <option value="centroids" id="elemId_0_hierarch_lev2">Select idea</option>
+            <option value="centroids" id="elemId_0_hierarch_lev2">Select subdescriptor</option>
 
         </select>
 
-<label for= "select_subdescriptors_hierarchical" id = "lab_select_hiererchical_lev2" > Select subdescriptor
-        languages </label>
+<label for= "select_subdescriptors_hierarchical" id = "lab_select_hiererchical_lev2" >Select subdescriptor</label>
 
 
 
-
-<!--        <label for= "selectLang" id = "lablSelectLang" > Select original and target-->
-<!--        languages </label>-->
-
-
-            </p>
-
-
-            <BR/>
-    <BR/>    <BR/>    <BR/>
 <table style="width:100%">
        <tr>
       <div id="div_ideas_hierarchical" class="centralDiv">
 
           </div>
+             <BR/>
   </tr>
   <tr>
     <div id="div_phrases_hierarchical" class="centralDiv">
@@ -117,40 +101,13 @@ Hierarchical spicy classifier
 
 
 </table>
-
-
-
-
-
-<!--            </div>-->
-
-<!--            <table   style = "width:100%" >-->
-<!--            <tr>-->
-<!--            <div       id = "textTrans"         class         = "centralDiv" >-->
-<!--            Examples  {{all_centroids}}-->
-<!--        </div>-->
-<!--        </tr>-->
-<!--        <tr>-->
-<!--        <div id ="div_ideas" class        = "centralDiv" >-->
-<!--            { % set new_var = all_centroids % }-->
-<!--        Examples {{new_var}}-->
-<!--        </div>-->
-<!--        </tr>-->
-
-
-<!--        </table>-->
-<!--        <BR/>-->
-
-
-
-
             <script     src = "//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" ></script>
         <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
 
              <script type=text/javascript>
 
-                  var json_subdescriptors_phrases_k_means = {{df_kmeans_subdescriptors_phrases|safe}};
-                  var json_descriptors_subdescriptors_k_means = {{k_means_descriptors_subdescriptors|safe}};
+                  var json_subdescriptors_phrases_k_means = {{json_kmeans_subdescriptors_phrases|safe}};
+                  var json_descriptors_subdescriptors_k_means = {{json_k_means_descriptors_subdescriptors|safe}};
                   var json_subdescriptors_phrases_hierarchical = {{json_subdescriptors_phrases_hierarchical|safe}};
                   var json_descriptors_subdescriptors_hierarchical = {{json_descriptors_subdescriptors_hierarchical|safe}};
 
