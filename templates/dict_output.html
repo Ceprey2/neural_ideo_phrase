@@ -8,19 +8,39 @@
 
 
 K-means classifier
-<form method="post" name="select_lang_submission_form" action="{{url_for('get_language')}}">
+<form method="post" name="select_lang_submission_form" action="{{url_for('update_options')}}">
      <div class="form-group">
         <input type="hidden" name="delete_input"/>
     </div>
-
+  <label for= "select_language" id = "select_interface_language" > Select interface language</label>
  <select  type="submit" id="select_language" name="select_language" onChange="this.form.submit();" >
-   <option value="init" id="elem_id_language_0">Select language</option>
+   <option value="ukrlang" id="elem_id_language_0">Українська</option>
             <option value="engllang">English</option>
 
-            <option value="ukrlang" >Українська</option>
+
            <option value="ruslang" >Русский</option>
         </select>
-     <label for= "select_language" id = "lab_lSelectLang" > Select interface language</label>
+
+ <label for= "select_clusters_number" id = "select_clusters_number_label" > Select number of clusters</label>
+    <select  type="submit" id="select_clusters_number" name="select_clusters_number" onChange="this.form.submit();" >
+   <option value="init" id="select_clusters_number_opt">20</option>
+
+            <option value="20">20</option>
+
+            <option value="40" >40</option>
+           <option value="60">60</option>
+        </select>
+
+
+  <label for= "select_subclusters_number" id = "select_subclusters_number_label" > Select number of subclusters</label>
+      <select  type="submit" id="select_subclusters_number" name="select_subclusters_number" onChange="this.form.submit();" >
+   <option value="init" id="select_subclusters_number_opt">50</option>
+            <option value="50">50</option>
+
+            <option value="100">100</option>
+           <option value="150">150</option>
+        </select>
+
 
         <p>
 
@@ -30,17 +50,17 @@ K-means classifier
 
 <button id="btn_clear">Сlear</button>
 
-
+  <label for= "select_descriptor_k_means" id = "select_descriptor_k_means_label" >Select descriptor k_means</label>
         <select name="select_descriptor_k_means" id="select_descriptor_k_means">
-  <option value="centroids" id="elemId_0_k_means">Select descriptor</option>
+
 
 
         </select>
 
 
 
-        <label for= "select_descriptor_k_means" id = "labl_select_centroid" >Select descriptor</label>
 
+<label for= "select_subdescriptor_k_means" id = "labl_select_subdescriptor_k_means_label" >Select subdescriptor k-means</label>
 <select name="select_subdescriptor_k_means" id="select_subdescriptor_k_means">
 
   <option value="centroids" id="elemId_1_k_means">Select subdescriptor</option>
@@ -69,21 +89,21 @@ K-means classifier
 
 
 Hierarchical spicy classifier
-
+<label for= "select_descriptor_hierarchical" id = "select_descriptor_hierarchical_label">Select descriptor</label>
    <select name="select_descriptor_hierarchical" id="select_descriptor_hierarchical">
 
-            <option value="centroids" id="elemId_0_hierarch">Select descriptor</option>
+            <option value="centroids" id="elemId_0_hierarch">Select descriptor (hierarchical spicy)</option>
 
         </select>
-<label for= "select_descriptor_hierarchical" id = "lab_select_hiererchical">Select descriptor</label>
 
+<label for= "select_subdescriptors_hierarchical" id = "lab_select_hiererchical_label" >Select subdescriptor  (hierarchical spicy)</label>
   <select name="select_subdescriptors_hierarchical" id="select_subdescriptors_hierarchical">
 
             <option value="centroids" id="elemId_0_hierarch_lev2">Select subdescriptor</option>
 
         </select>
 
-<label for= "select_subdescriptors_hierarchical" id = "lab_select_hiererchical_lev2" >Select subdescriptor</label>
+
 
 
 
@@ -111,6 +131,8 @@ Hierarchical spicy classifier
                   var json_descriptors_subdescriptors_k_means = {{json_k_means_descriptors_subdescriptors|safe}};
                   var json_subdescriptors_phrases_hierarchical = {{json_subdescriptors_phrases_hierarchical|safe}};
                   var json_descriptors_subdescriptors_hierarchical = {{json_descriptors_subdescriptors_hierarchical|safe}};
+                  var clusters_number = {{clusters_number|safe}};
+                  var subclusters_number = {{subclusters_number|safe}};
 
                 </script>
 

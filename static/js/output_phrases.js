@@ -65,10 +65,10 @@ function get_phrases_according_descriptors(descriptor, subdescriptor, json_descr
     console.log(descriptor)
     console.log("subdescriptor")
     console.log(subdescriptor)
-    console.log("json_descriptors_subdescriptors: ")
-    console.log(json_descriptors_subdescriptors[0])
-    console.log("json_subdescriptors_phrases")
-    console.log(json_subdescriptors_phrases[0])
+    // console.log("json_descriptors_subdescriptors: ")
+    // console.log(json_descriptors_subdescriptors[0])
+    // console.log("json_subdescriptors_phrases")
+    // console.log(json_subdescriptors_phrases[0])
 
 
     var phrases_str_to_return = [];
@@ -81,9 +81,16 @@ function get_phrases_according_descriptors(descriptor, subdescriptor, json_descr
                 phrases_str_to_return.push(lang.toUpperCase() + ":" + "<br/>");
 
                 json_subdescriptors_phrases.forEach(function (element_sub_phr) {
+                    // alert(element_descr_subd["subclusters"]+ element_sub_phr["subclusters"])
 
                     if (element_descr_subd["subclusters"].includes(element_sub_phr["subclusters"])) {
+                      // alert("INCLUDES")
+
                         console.log("cluster includes subclusters and subdescriptor: " + subdescriptor)
+
+                            console.log("Element subcluster "+element_sub_phr["subclusters"]+" субдескриптор "+subdescriptor)
+                            console.log("hhhhSubdescriptor")
+                            console.log(subdescriptor)
 
                         if (subdescriptor == "Select subdescriptor" || subdescriptor == "") {
 
@@ -103,8 +110,7 @@ function get_phrases_according_descriptors(descriptor, subdescriptor, json_descr
 
                         } else if (element_sub_phr["subclusters"] == subdescriptor) {
 
-                            console.log("gggggg")
-                            console.log(element_sub_phr[lang])
+
 
                             if (element_sub_phr[lang] != null && element_sub_phr[lang].trim()) { // mentioning object means, it has a value, it is not null neither empty string
 
@@ -163,7 +169,7 @@ $('#select_subdescriptor_k_means').change(function () {
     console.log($('#select_subdescriptor_k_means').val())
 
 
-    $('#div_phrases_k_means').html(get_phrases_according_descriptors(descriptor_k_means.val().trim(), $('#select_subdescriptor_k_means').val().trim(), json_descriptors_subdescriptors_hierarchical, json_subdescriptors_phrases_k_means));  // TODO: create an output function
+    $('#div_phrases_k_means').html(get_phrases_according_descriptors(descriptor_k_means.val().trim(), $('#select_subdescriptor_k_means').val().trim(), json_descriptors_subdescriptors_k_means, json_subdescriptors_phrases_k_means));  // TODO: create an output function
 });
 
 $('#btn_clear').click(function (){
@@ -172,3 +178,6 @@ $('#btn_clear').click(function (){
     $('#div_phrases_hierarchical').text("");
     $('#div_ideas_k_means').text("");
 });
+
+$('#select_clusters_number').val(clusters_number)
+$('#select_subclusters_number').val(subclusters_number)
