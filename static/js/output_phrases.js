@@ -30,14 +30,15 @@ function append_subdescriptors_to_select(select_id, subdescriptors_array) {
 append_descriptors_to_select("select_descriptor_k_means", json_descriptors_subdescriptors_k_means);
 append_descriptors_to_select("select_descriptor_hierarchical", json_descriptors_subdescriptors_hierarchical);
 
-let descriptor_k_means = $('#select_descriptor_k_means');
-let descriptor_hierarchical = $('#select_descriptor_hierarchical');
-let subdescriptor_hierarchical = $('#select_subdescriptors_hierarchical');
+const descriptor_k_means = $('#select_descriptor_k_means');
+const select_subdescriptor_k_means = $('#select_subdescriptor_k_means');
+const descriptor_hierarchical = $('#select_descriptor_hierarchical');
+const subdescriptor_hierarchical = $('#select_subdescriptors_hierarchical');
 
 descriptor_k_means.change(function () {
     let subdescriptors = []
     json_descriptors_subdescriptors_k_means.forEach(function (entry) {
-        if (descriptor_k_means.val().trim() == entry["cluster"])
+        if (descriptor_k_means.val().trim() === entry["cluster"])
             subdescriptors = entry["subclusters"].split(",");
 
     });
@@ -49,7 +50,7 @@ descriptor_k_means.change(function () {
 descriptor_hierarchical.change(function () {
     let subdescriptors = []
     json_descriptors_subdescriptors_hierarchical.forEach(function (entry) {
-        if (descriptor_hierarchical.val().trim() == entry["cluster"])
+        if (descriptor_hierarchical.val().trim() === entry["cluster"])
             subdescriptors = entry["subclusters"].split(",")
         //  alert(subdescriptors)
 
@@ -71,11 +72,11 @@ function get_phrases_according_descriptors(descriptor, subdescriptor, json_descr
     // console.log(json_subdescriptors_phrases[0])
 
 
-    var phrases_str_to_return = [];
+    let phrases_str_to_return = [];
 
     json_descriptors_subdescriptors.forEach(function (element_descr_subd) {
 
-        if (descriptor == element_descr_subd["cluster"].trim()) {
+        if (descriptor === element_descr_subd["cluster"].trim()) {
 
             languages.forEach(function (lang) {
                 phrases_str_to_return.push(lang.toUpperCase() + ":" + "<br/>");
@@ -92,7 +93,7 @@ function get_phrases_according_descriptors(descriptor, subdescriptor, json_descr
                             console.log("hhhhSubdescriptor")
                             console.log(subdescriptor)
 
-                        if (subdescriptor == "Select subdescriptor" || subdescriptor == "") {
+                        if (subdescriptor === "Select subdescriptor" || subdescriptor === "" || subdescriptor === descriptor) {
 
 
 
@@ -108,7 +109,7 @@ function get_phrases_according_descriptors(descriptor, subdescriptor, json_descr
                                 }
 
 
-                        } else if (element_sub_phr["subclusters"] == subdescriptor) {
+                        } else if (element_sub_phr["subclusters"] === subdescriptor) {
 
 
 
@@ -160,16 +161,16 @@ descriptor_k_means.change(function () {
     console.log(descriptor_k_means.text())
 
 
-    $('#div_phrases_k_means').html(get_phrases_according_descriptors(descriptor_k_means.val().trim(), $('#select_subdescriptor_k_means').val().trim(), json_descriptors_subdescriptors_k_means, json_subdescriptors_phrases_k_means));
+    $('#div_phrases_k_means').html(get_phrases_according_descriptors(descriptor_k_means.val().trim(), select_subdescriptor_k_means.val().trim(), json_descriptors_subdescriptors_k_means, json_subdescriptors_phrases_k_means));
 });
 
-$('#select_subdescriptor_k_means').change(function () {
+select_subdescriptor_k_means.change(function () {
 
     console.log("eeeeeeee$('#select_centroid').val()")
-    console.log($('#select_subdescriptor_k_means').val())
+    console.log(select_subdescriptor_k_means.val())
 
 
-    $('#div_phrases_k_means').html(get_phrases_according_descriptors(descriptor_k_means.val().trim(), $('#select_subdescriptor_k_means').val().trim(), json_descriptors_subdescriptors_k_means, json_subdescriptors_phrases_k_means));  // TODO: create an output function
+    $('#div_phrases_k_means').html(get_phrases_according_descriptors(descriptor_k_means.val().trim(), select_subdescriptor_k_means.val().trim(), json_descriptors_subdescriptors_k_means, json_subdescriptors_phrases_k_means));  // TODO: create an output function
 });
 
 $('#btn_clear').click(function (){

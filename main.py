@@ -12,9 +12,9 @@ from scipy.spatial.distance import pdist
 from sklearn.cluster import KMeans
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-dict_from_csv = list(csv.DictReader(open('phrases.csv')))
+dict_from_csv = list(csv.DictReader(open('all_phrases.csv')))
 clusters_number = 20
-subclusters_number = 50
+subclusters_number = 150
 
 
 
@@ -67,7 +67,7 @@ def transform_labels_to_names(labels_ward_1, labels_ward_2, descriptors):
     return  labels_ward_1_named, labels_ward_2_named
 
 
-def hierarchical_clustering(dict_from_csv,current_langugage):
+def hierarchical_clustering(dict_from_csv,current_langugage, clusters_number, subclusters_number):
 
     df_dict_from_csv = pd.DataFrame(dict_from_csv)
     descriptors = df_dict_from_csv[current_langugage+'hetmans']
@@ -88,41 +88,13 @@ def hierarchical_clustering(dict_from_csv,current_langugage):
 
    # ClusterNode(Z[1])
     names = tfidf.get_feature_names()
-    print("len(names)")
-    print(len(names))
 
-    cutree = cut_tree(mergings,  height=1.2)
+
+    labeled_rows_by_numbers_hierarchical_level1 = [element[0] for element in cut_tree(mergings, n_clusters=clusters_number)]
+    labeled_rows_by_numbers_hierarchical_level2 = [element[0] for element in cut_tree(mergings, n_clusters=subclusters_number)]
     #cutree = cut_tree(Z_ward,  n_clusters=24)
 
-    # print("cutree")
-    # print(cutree)
-    # print(cutree.shape)
 
-    print ("height 1.2")
-    #print_cut_tree_features(cutree, names)
-
-    cutree = cut_tree(mergings, height=1.3)
-    #print ("height 1.3")
-    #print_cut_tree_features(cutree, names)
-
-    cutree = cut_tree(mergings, height=1)
-    #print("height 1")
-    #print_cut_tree_features(cutree, names)
-
-    cutree = cut_tree(mergings, height=0)
-    #print("height 0")
-    #print_cut_tree_features(cutree, names)
-
-
-    to_tree_obj = sch.to_tree(Z_ward)
-    print("to_tree_obj")
-    print(to_tree_obj)
-    #print("to_tree_obj")
-    #print(to_tree_obj)
-    #print("pre_order length")
-    #print(len(to_tree_obj.pre_order()))
-    #print("to_tree_obj.get_count()")
-    #print(to_tree_obj.get_count())
 
     #Y = ward(pdist(X))
     #Z = linkage(Y)
@@ -130,8 +102,6 @@ def hierarchical_clustering(dict_from_csv,current_langugage):
 
 
 
-    y_dist = pdist(X)
-    Z_centroid = centroid(y_dist)
 
 
     print("leaders")
@@ -143,80 +113,31 @@ def hierarchical_clustering(dict_from_csv,current_langugage):
                )
     plt.show()
 
-    labels = sch.fcluster(mergings, 1, criterion='distance')
-    # print("mergings t=10 labels", labels)
-    #
-    # print("mergings shape")
-    # print(mergings.shape)
-    # print(mergings[0])
-    # print(mergings[2])
-    # print(mergings[248])
-    # print(mergings[286])
-    #
-    # print(mergings[0][0])
-    # print("Z_ward shape")
-    # print(Z_ward.shape)
-    # print("centroid shape")
-    # print(Z_centroid.shape)
-
-    # idxs = [33, 68, 62]
-    # plt.figure(figsize=(10, 8))
-    #
-    # plt.scatter([X[:,0]],[X[:,1]])# plot all points
-    # plt.scatter([X[idxs, 0]], [X[idxs, 1]], c='r')  # plot interesting points in red again
-    # plt.show()
-
-    cutree = cut_tree(Z_centroid, height=1)
-    #print("height 1")
-    #print_cut_tree_features(cutree, names)
-
-    cutree = cut_tree(Z_centroid, height=3)
-    #print("height 3")
-    #print_cut_tree_features(cutree, names)
-
-    for i in range(400, 180, -1):
-
-        labeled_rows_by_numbers_ward_level1 = fcluster(Z_ward, i//100,
-                             criterion='distance')
-        print("curr clusters number", len(set(labeled_rows_by_numbers_ward_level1)))
-        if (len(set(labeled_rows_by_numbers_ward_level1)) in range(clusters_number-5, clusters_number+5)):
-            print("Compatinng clusters number", len(set(labeled_rows_by_numbers_ward_level1)))
-            break
-
-    for i in range(230, 80, -1):
-
-        labeled_rows_by_numbers_ward_level2 = fcluster(Z_ward, i // 100,
-                                                       criterion='distance')
-        if (len(set(labeled_rows_by_numbers_ward_level2)) in range(subclusters_number-5, subclusters_number+5)):
-            break
-
-    labeled_rows_by_numbers_ward_level2 = fcluster(Z_ward, 1, criterion='distance')
-    print("HIERATCHICAL labeled_rows_by_numbers_ward_level2")
-    print(labeled_rows_by_numbers_ward_level1)
-    print("terms")
-    print(terms)
 
 
 
-    labels_ward_1_named, labels_ward_2_named = transform_labels_to_names(labeled_rows_by_numbers_ward_level1, labeled_rows_by_numbers_ward_level2, descriptors)
+
+
+
+    labels_hierarchical_1_named, labels_hierarchical_2_named = transform_labels_to_names(labeled_rows_by_numbers_hierarchical_level1, labeled_rows_by_numbers_hierarchical_level2, descriptors)
 
     print("Varian 1 labels_ward_1")
-    print(labels_ward_1_named)
-    print(labeled_rows_by_numbers_ward_level1)
+    print(labels_hierarchical_1_named)
+    print(labeled_rows_by_numbers_hierarchical_level1)
     #labels_ward_1_named = [terms[label] for label in labeled_rows_by_numbers_ward_level1]
     # labels_ward_2_named = [terms[label] for label in labeled_rows_by_numbers_ward_level2]
     print("Varian 2 labels_ward_1")
-    print(labels_ward_1_named)
+    print(labels_hierarchical_2_named)
 
 
-    print("labels_ward_2_named")
-    print(labels_ward_2_named)
+    print("labels_whierarchical2_named")
+    print(labels_hierarchical_2_named)
 
     pd.set_option('display.max_rows', None)  # TO AVOID TRUNCATING TABLE WHEN PRINTING
     pd.set_option('display.max_columns', 15)
     pd.set_option('display.width', None)
     pd.set_option('display.max_colwidth', 1000)
-    df_ward = pd.DataFrame({current_langugage: phrases, 'labels2': labels_ward_2_named, 'labels1': labels_ward_1_named})
+    df_ward = pd.DataFrame({current_langugage: phrases, 'labels2': labels_hierarchical_2_named, 'labels1': labels_hierarchical_1_named})
 
 
 
@@ -225,7 +146,7 @@ def hierarchical_clustering(dict_from_csv,current_langugage):
 
 
     df_ward_labels2_phrases = pd.DataFrame({
-        'subdescriptors': labels_ward_2_named,
+        'subdescriptors': labels_hierarchical_2_named,
          "ukrlang": df_dict_from_csv["ukrlang"],
          "engllang": df_dict_from_csv["engllang"],
          "spanishlang": df_dict_from_csv["spanishlang"],
@@ -234,7 +155,7 @@ def hierarchical_clustering(dict_from_csv,current_langugage):
         "frenchlang": df_dict_from_csv["frenchlang"],
          "latinlang": df_dict_from_csv["latinlang"],
          "hebrlang": df_dict_from_csv["hebrlang"],
-         "subclusters": labels_ward_2_named,
+         "subclusters": labels_hierarchical_2_named,
           }
     ).groupby('subdescriptors').agg(' '.join)
 
@@ -247,7 +168,7 @@ def hierarchical_clustering(dict_from_csv,current_langugage):
     # "hebrlang": df_structured_data["hebrlang"],
     df_ward_labels2_phrases["subclusters"]=df_ward_labels2_phrases.index
 
-    df_ward_labels1_labels2 = pd.DataFrame({"descriptors": labels_ward_1_named,  "cluster": labels_ward_1_named, "subclusters": labels_ward_2_named  }).sort_values(by=['descriptors']).drop_duplicates()
+    df_ward_labels1_labels2 = pd.DataFrame({"descriptors": labels_hierarchical_1_named,  "cluster": labels_hierarchical_1_named, "subclusters": labels_hierarchical_2_named  }).sort_values(by=['descriptors']).drop_duplicates()
 
 
     df_ward_labels1_labels2 = df_ward_labels1_labels2.groupby('descriptors').agg(', '.join)
@@ -351,7 +272,7 @@ def k_means_subclusters_phrases(csv_dict_structured_data, number_or_subclusters,
     return df_k_means_clusters_phrases
 
 
-def k_means_subclusters_descriptors(csv_dict_structured_data, number_or_subclusters):
+def k_means_subclusters_descriptors(csv_dict_structured_data, number_or_subclusters, subclusters_number):
     rng = range(number_or_subclusters - 1, number_or_subclusters)
     inertias = []
 
@@ -426,10 +347,10 @@ def main():
 
 
     json_kmeans_subdescriptors_phrases = k_means_subclusters_phrases(dict_from_csv,  subclusters_number, current_language)
-    json_k_means_descriptors_subdescriptors = k_means_subclusters_descriptors(json_kmeans_subdescriptors_phrases, clusters_number)
+    json_k_means_descriptors_subdescriptors = k_means_subclusters_descriptors(json_kmeans_subdescriptors_phrases, clusters_number, subclusters_number)
 
 
-    json_subdescriptors_phrases_hierarchical, json_descriptors_subdescriptors_hierarchical = hierarchical_clustering(dict_from_csv, current_language)
+    json_subdescriptors_phrases_hierarchical, json_descriptors_subdescriptors_hierarchical = hierarchical_clustering(dict_from_csv, current_language, clusters_number, subclusters_number)
     return render_template('dict_output.html',
                            json_kmeans_subdescriptors_phrases=json_kmeans_subdescriptors_phrases.to_json(orient='records'), json_k_means_descriptors_subdescriptors=json_k_means_descriptors_subdescriptors,
                            json_subdescriptors_phrases_hierarchical=json_subdescriptors_phrases_hierarchical, json_descriptors_subdescriptors_hierarchical=json_descriptors_subdescriptors_hierarchical,
@@ -463,10 +384,10 @@ def update_options():
     print(current_language)
     json_kmeans_subdescriptors_phrases = k_means_subclusters_phrases(dict_from_csv, subclusters_number, current_language)
     json_k_means_descriptors_subdescriptors = k_means_subclusters_descriptors(json_kmeans_subdescriptors_phrases,
-                                                                            clusters_number)
+                                                                            clusters_number, subclusters_number)
 
     json_subdescriptors_phrases_hierarchical, json_descriptors_subdescriptors_hierarchical = hierarchical_clustering(
-        dict_from_csv, current_language)
+        dict_from_csv, current_language, clusters_number, subclusters_number)
     return render_template('dict_output.html',
                            json_kmeans_subdescriptors_phrases=json_kmeans_subdescriptors_phrases.to_json(
                                orient='records'),
