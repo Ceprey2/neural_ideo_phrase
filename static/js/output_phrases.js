@@ -1,15 +1,10 @@
 languages = ['ukrlang', 'ruslang', 'engllang', 'spanishlang', 'frenchlang', 'itallang', 'latinlang', 'hebrlang'];
 
 function append_descriptors_to_select(select_id, descriptors_subdescriptors_json) {
-
-
     descriptors_subdescriptors_json.forEach(function (current_entry) {
-
-
         $('#' + select_id).append(`<option value=${current_entry["cluster"]}>
                                        ${current_entry["cluster"]}
                                   </option>`)
-
     });
 }
 
@@ -18,8 +13,6 @@ function append_subdescriptors_to_select(select_id, subdescriptors_array) {
 
     $('#' + select_id).empty().append('<option selected="selected">Select subdescriptor</option>');
     subdescriptors_array.forEach(function (subdescriptors) {
-
-
         $('#' + select_id).append(`<option value=${subdescriptors}>
                                        ${subdescriptors}
                                   </option>`)
@@ -94,9 +87,6 @@ function get_phrases_according_descriptors(descriptor, subdescriptor, json_descr
                             console.log(subdescriptor)
 
                         if (subdescriptor === "Select subdescriptor" || subdescriptor === "" || subdescriptor === descriptor) {
-
-
-
                                 console.log("subdescriptor not chosen");
                                 console.log("element_sub_phr - engllang");
                                 console.log(element_sub_phr['engllang']);
@@ -104,35 +94,22 @@ function get_phrases_according_descriptors(descriptor, subdescriptor, json_descr
                                     console.log("undefined "+lang);
                                 }
                                 if (element_sub_phr[lang] != null && element_sub_phr[lang].trim()) { // mentioning object means, it has a value, it is not null neither empty string
-
                                     phrases_str_to_return.push(element_sub_phr[lang]+'#');
                                 }
-
-
                         } else if (element_sub_phr["subclusters"] === subdescriptor) {
-
-
-
                             if (element_sub_phr[lang] != null && element_sub_phr[lang].trim()) { // mentioning object means, it has a value, it is not null neither empty string
-
                                 phrases_str_to_return.push(element_sub_phr[lang]+'#');
                             }
-
                         }
                     }
-
                 });
-
                 phrases_str_to_return.push("<br/>");
-
             });
         }
-
     });
     console.log("phrases_str_to_return")
     console.log(phrases_str_to_return)
     return phrases_str_to_return;
-
 }
 
 descriptor_hierarchical.change(function () {

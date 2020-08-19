@@ -8,7 +8,7 @@
 
 
 K-means classifier
-<form method="post" name="select_lang_submission_form" action="{{url_for('update_options')}}">
+<form method="post" id="select_lang_submission_form" name="select_lang_submission_form" action="{{url_for('update_options')}}">
     <div class="form-group">
         <input type="hidden" name="delete_input"/>
     </div>
@@ -16,17 +16,12 @@ K-means classifier
     <select type="submit" id="select_language" name="select_language" onChange="this.form.submit();">
         <option value="ukrlang" id="elem_id_language_0">Українська</option>
         <option value="engllang">English</option>
-
-
         <option value="ruslang">Русский</option>
     </select>
 
     <label for="select_clusters_number" id="select_clusters_number_label"> Select number of clusters</label>
     <select type="submit" id="select_clusters_number" name="select_clusters_number" onChange="this.form.submit();">
         <option value="init" id="select_clusters_number_opt">20</option>
-
-        <option value="20">20</option>
-
         <option value="40">40</option>
         <option value="60">60</option>
     </select>
@@ -36,12 +31,12 @@ K-means classifier
     <select type="submit" id="select_subclusters_number" name="select_subclusters_number"
             onChange="this.form.submit();">
         <option value="init" id="select_subclusters_number_opt">50</option>
-        <option value="50">50</option>
+
 
         <option value="100">100</option>
         <option value="150">150</option>
-            <option value="150">200</option>
-            <option value="150">250</option>
+            <option value="200">200</option>
+            <option value="250">250</option>
     </select>
 
 
@@ -129,15 +124,10 @@ Hierarchical spicy classifier
 <script type=text/javascript>
 
     var json_subdescriptors_phrases_k_means = {{json_kmeans_subdescriptors_phrases|safe}};
-    ;
     var json_descriptors_subdescriptors_k_means = {{json_k_means_descriptors_subdescriptors|safe}};
-    ;
     var json_subdescriptors_phrases_hierarchical = {{json_subdescriptors_phrases_hierarchical|safe}};
-    ;
     var json_descriptors_subdescriptors_hierarchical = {{json_descriptors_subdescriptors_hierarchical|safe}};
-    ;
     var clusters_number = {{clusters_number|safe}};
-    ;
     var subclusters_number = {{subclusters_number | safe}};
 
 </script>
