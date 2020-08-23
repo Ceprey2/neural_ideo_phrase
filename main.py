@@ -13,8 +13,22 @@ from sklearn.cluster import KMeans
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 dict_from_csv = list(csv.DictReader(open('phrases.csv')))
-clusters_number = 40
-subclusters_number = 250
+clusters_number = 20
+subclusters_number = 50
+
+
+def count_total_phrases():
+    languages = ['ukrlang', 'ruslang', 'engllang', 'spanishlang', 'frenchlang', 'itallang', 'latinlang', 'hebrlang']
+
+    all_phrases_array = []
+    for lang in languages:
+        phrases_array = [phr[lang] for phr in dict_from_csv if phr[lang] != ""]
+        all_phrases_array.extend(phrases_array)
+
+
+    print("Total phrases: ", len(all_phrases_array))
+
+count_total_phrases()
 
 
 
@@ -37,9 +51,7 @@ def get_centroid_feature_for_cluster(descriptors):
     all_normalized_descriptors = [ds.replace("*", "").strip().lower() for ds in list_descriptors if len(ds) > 1]
 
     if (len (all_normalized_descriptors)) > 0:
-
         return max(set(all_normalized_descriptors), key=all_normalized_descriptors.count) # searching for mode
-
     else:
         return 'empty_center'
 
@@ -74,7 +86,7 @@ def hierarchical_clustering(dict_from_csv,current_langugage, clusters_number, su
     phrases =  df_dict_from_csv[current_langugage]
     df_dict_from_csv.fillna('null', inplace=True)
 
-    # Calculate the linkage: mergings
+    # Calculate the linkfage: mergings
     tfidf = TfidfVectorizer(token_pattern=r"(?u)\b\w+'?\w+\b")
     X = tfidf.fit_transform(descriptors).todense()
     mergings = linkage(X, method="complete")
@@ -90,26 +102,26 @@ def hierarchical_clustering(dict_from_csv,current_langugage, clusters_number, su
     #Y = ward(pdist(X))
     #Z = linkage(Y)
     #leaders = scipy.cluster.hierarchy.leaders(X, Z)
-    print("leaders")
-    print(leaders)
-    dendrogram(mergings,
-
-               leaf_rotation=90,
-               leaf_font_size=6,
-               )
-    plt.show()
+    #print("leaders")
+    #print(leaders)
+    # dendrogram(mergings,
+    #
+    #            leaf_rotation=90,
+    #            leaf_font_size=6,
+    #            )
+    # plt.show()
 
     labels_hierarchical_1_named, labels_hierarchical_2_named = transform_labels_to_names(labeled_rows_by_numbers_hierarchical_level1, labeled_rows_by_numbers_hierarchical_level2, descriptors)
 
-    print("Varian 1 labels_ward_1")
-    print(labels_hierarchical_1_named)
-    print(labeled_rows_by_numbers_hierarchical_level1)
-    print("Varian 2 labels_ward_1")
-    print(labels_hierarchical_2_named)
+    # print("Varian 1 labels_ward_1")
+    # print(labels_hierarchical_1_named)
+    # print(labeled_rows_by_numbers_hierarchical_level1)
+    # print("Varian 2 labels_ward_1")
+    # print(labels_hierarchical_2_named)
 
 
-    print("labels_whierarchical2_named")
-    print(labels_hierarchical_2_named)
+    # print("labels_whierarchical2_named")
+    # print(labels_hierarchical_2_named)
 
     pd.set_option('display.max_rows', None)  # TO AVOID TRUNCATING TABLE WHEN PRINTING
     pd.set_option('display.max_columns', 15)
@@ -127,7 +139,7 @@ def hierarchical_clustering(dict_from_csv,current_langugage, clusters_number, su
          "hebrlang": df_dict_from_csv["hebrlang"],
          "subclusters": labels_hierarchical_2_named,
           }
-    ).groupby('subdescriptors').agg(' '.join)
+    ).groupby('subdescriptors').agg(', '.join)
 
     # "engllang": df_structured_data["engllang"],
     # "spanishlang": df_structured_data["spanishlang"],
@@ -146,8 +158,8 @@ def hierarchical_clustering(dict_from_csv,current_langugage, clusters_number, su
 
 
 
-    print("df_whierarchical_labels2_phrases")
-    print(df_hierarchical_labels2_phrases)
+    # print("df_whierarchical_labels2_phrases")
+    # print(df_hierarchical_labels2_phrases)
 
 
 
@@ -169,7 +181,7 @@ def hierarchical_clustering(dict_from_csv,current_langugage, clusters_number, su
 
 def k_means_subclusters_phrases(csv_dict_structured_data, number_or_subclusters, current_language):
 
-    rng = range(number_or_subclusters-1,number_or_subclusters)
+
     inertias = []
 
     df_structured_data = pd.DataFrame(csv_dict_structured_data) #converting ordered dict to dataframe
@@ -180,19 +192,23 @@ def k_means_subclusters_phrases(csv_dict_structured_data, number_or_subclusters,
     tfidf = TfidfVectorizer(token_pattern=r"(?u)\b\w+'?\w+\b")
     X = tfidf.fit_transform(descriptors)
 
-    for k in rng:
-        model = KMeans(n_clusters=k, random_state=17)
-        model.fit(X)
-        inertias.append(model.inertia_)
+    # rng = range(number_or_subclusters - 1, number_or_subclusters)
+    #
+    # for k in rng:
+    #     model = KMeans(n_clusters=k, random_state=17)
+    #     model.fit(X)
+    #     inertias.append(model.inertia_)
 
+    model = KMeans(n_clusters=number_or_subclusters, random_state=17)
+    model.fit(X)
 
     order_centroids = model.cluster_centers_.argsort()[:, ::-1]
     terms = tfidf.get_feature_names()
     labels = model.labels_  # the model assigns as many labels as rows are in the table
-    print("k_means model.labels_ set")
-    print(set(labels))
-    print("model.labels_ LENGHT")
-    print(len((model.labels_)))
+    # print("k_means model.labels_ set")
+    # print(set(labels))
+    # print("model.labels_ LENGHT")
+    # print(len((model.labels_)))
 
     named_labels = [terms[order_centroids[label, :1][0]] for label in labels]
 
@@ -208,10 +224,10 @@ def k_means_subclusters_phrases(csv_dict_structured_data, number_or_subclusters,
                                                     "ruslang": df_structured_data["ruslang"],
                                                     "latinlang": df_structured_data["latinlang"],
                                                     "hebrlang": df_structured_data["hebrlang"],
-        "descriptors_set_inside_entry": df_structured_data["ukrlanghetmans"],
+        "descriptors_set_inside_entry": df_structured_data[current_language+"hetmans"],
                                          "subdescriptors": named_labels,
                                         "subclusters": named_labels
-                                        }).groupby('subdescriptors').agg(' '.join)
+                                        }).groupby('subdescriptors').agg(', '.join)
 
     df_k_means_clusters_phrases["subclusters"] = df_k_means_clusters_phrases.index
 
@@ -219,14 +235,14 @@ def k_means_subclusters_phrases(csv_dict_structured_data, number_or_subclusters,
     pd.set_option('display.max_columns', 15)
     pd.set_option('display.width', None)
     pd.set_option('display.max_colwidth', 1000)
-    print("Current level df_k_means_cluster: ")
-    print(df_k_means_clusters_phrases)
-    print(df_k_means_clusters_phrases.index)
+    # print("Current level df_k_means_cluster: ")
+    # print(df_k_means_clusters_phrases)
+    # print(df_k_means_clusters_phrases.index)
     return df_k_means_clusters_phrases
 
 
-def k_means_subclusters_descriptors(csv_dict_structured_data, number_or_subclusters, subclusters_number):
-    rng = range(number_or_subclusters - 1, number_or_subclusters)
+def get_k_means_descriptors_subdescriptors_df(csv_dict_structured_data, clusters_number):
+
     inertias = []
 
 
@@ -242,26 +258,30 @@ def k_means_subclusters_descriptors(csv_dict_structured_data, number_or_subclust
     tfidf = TfidfVectorizer(token_pattern=r"(?u)\b\w+'?\w+\b")
     X = tfidf.fit_transform(descriptors)
 
-    for k in rng:
-        model = KMeans(n_clusters=k, random_state=17)
-        model.fit(X)
-        inertias.append(model.inertia_)
+    # rng = range(clusters_number - 1, clusters_number)
+    #
+    # for k in rng:
+    #     model = KMeans(n_clusters=k, random_state=17)
+    #     model.fit(X)
+    #     inertias.append(model.inertia_)
 
+    model = KMeans(n_clusters=clusters_number, random_state=17)
+    model.fit(X)
 
     order_centroids = model.cluster_centers_.argsort()[:, ::-1]
     terms = tfidf.get_feature_names()
-    print("order centroids")
-    print(order_centroids.shape)
+    # print("order centroids")
+    # print(order_centroids.shape)
     labels = model.labels_  # the model assigns as many labels as rows are in the table
-    print("k_means model.labels_ set")
-    print(set(labels))
-    print("model.labels_ LENGHT")
-    print(len((model.labels_)))
+    # print("k_means model.labels_ set")
+    # print(set(labels))
+    # print("model.labels_ LENGHT")
+    # print(len((model.labels_)))
 
     named_labels = [terms[order_centroids[label, :1][0]] for label in labels]
 
-    print("df_structured_data")
-    print(df_structured_data)
+    # print("df_structured_data")
+    # print(df_structured_data)
     df_k_means_clusters = pd.DataFrame(
     {"subclusters": df_structured_data.index, #index, because in df_structured_data 'subclusters' is the name of rows, not column
 
@@ -284,9 +304,9 @@ def k_means_subclusters_descriptors(csv_dict_structured_data, number_or_subclust
     pd.set_option('display.width', None)
     pd.set_option('display.max_colwidth', 1000)
 
-    print("Current level df_k_means_cluster: ")
-    print(df_k_means_clusters)
-    print(df_k_means_clusters.index)
+    # print("Current level df_k_means_cluster: ")
+    # print(df_k_means_clusters)
+    # print(df_k_means_clusters.index)
 
     df_k_means_descriptors_subdescriptors = open('df_k_means_descriptors_subdescriptors.csv', 'w')
 
@@ -305,14 +325,14 @@ def main():
 
 
     json_kmeans_subdescriptors_phrases = k_means_subclusters_phrases(dict_from_csv,  subclusters_number, current_language)
-    json_k_means_descriptors_subdescriptors = k_means_subclusters_descriptors(json_kmeans_subdescriptors_phrases, clusters_number, subclusters_number)
+    json_k_means_descriptors_subdescriptors = get_k_means_descriptors_subdescriptors_df(json_kmeans_subdescriptors_phrases, clusters_number)
 
 
     json_subdescriptors_phrases_hierarchical, json_descriptors_subdescriptors_hierarchical = hierarchical_clustering(dict_from_csv, current_language, clusters_number, subclusters_number)
     return render_template('dict_output.html',
                            json_kmeans_subdescriptors_phrases=json_kmeans_subdescriptors_phrases.to_json(orient='records'), json_k_means_descriptors_subdescriptors=json_k_means_descriptors_subdescriptors,
                            json_subdescriptors_phrases_hierarchical=json_subdescriptors_phrases_hierarchical, json_descriptors_subdescriptors_hierarchical=json_descriptors_subdescriptors_hierarchical,
-                           clusters_number=clusters_number, subclusters_number=subclusters_number)
+                           clusters_number=clusters_number, subclusters_number=subclusters_number, current_language=current_language)
 
 def draw_classifier_plot(rng, inertias):
     plt.plot(rng, inertias, '-o')
@@ -324,25 +344,27 @@ def draw_classifier_plot(rng, inertias):
 
 @app.route('/update_options', methods=['POST'])
 def update_options():
-    clusters_number = 20
-    subclusters_number = 50 # Why does not Python see the global value?
 
     current_language = request.form.get('select_language')
-
+    global clusters_number
+    global subclusters_number
 
     try:
         subclusters_number = int(request.form.get('select_subclusters_number'))
-    except: ValueError("Subclusters not chosen")  # If in html I change subcluster, they are submitted, but clusters are not, because they are not changes
+    except:
+        ValueError("Subclusters not chosen")  # If in html I change subcluster, they are submitted, but clusters are not, because they are not changes
 
     try:
         clusters_number = int(request.form.get('select_clusters_number'))
-    except: ValueError("Clusters not chosen")
+    except:
+        ValueError("Clusters not chosen")
 
-    if (current_language is None): current_language = "ukrlang"
+    if (current_language is None):
+        current_language = "ukrlang"
     print(current_language)
     json_kmeans_subdescriptors_phrases = k_means_subclusters_phrases(dict_from_csv, subclusters_number, current_language)
-    json_k_means_descriptors_subdescriptors = k_means_subclusters_descriptors(json_kmeans_subdescriptors_phrases,
-                                                                            clusters_number, subclusters_number)
+    json_k_means_descriptors_subdescriptors = get_k_means_descriptors_subdescriptors_df(json_kmeans_subdescriptors_phrases,
+                                                                                        clusters_number)
 
     json_subdescriptors_phrases_hierarchical, json_descriptors_subdescriptors_hierarchical = hierarchical_clustering(
         dict_from_csv, current_language, clusters_number, subclusters_number)
@@ -352,7 +374,7 @@ def update_options():
                            json_k_means_descriptors_subdescriptors=json_k_means_descriptors_subdescriptors,
                            json_subdescriptors_phrases_hierarchical=json_subdescriptors_phrases_hierarchical,
                            json_descriptors_subdescriptors_hierarchical=json_descriptors_subdescriptors_hierarchical,
-                           clusters_number=clusters_number, subclusters_number=subclusters_number)
+                           clusters_number=clusters_number, subclusters_number=subclusters_number, current_language=current_language)
 
 
 

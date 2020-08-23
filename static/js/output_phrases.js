@@ -55,7 +55,7 @@ descriptor_hierarchical.change(function () {
 
 function get_phrases_according_descriptors(descriptor, subdescriptor, json_descriptors_subdescriptors, json_subdescriptors_phrases) {
 
-    console.log("descriptor")
+    console.log("oooooodescriptor")
     console.log(descriptor)
     console.log("subdescriptor")
     console.log(subdescriptor)
@@ -93,12 +93,12 @@ function get_phrases_according_descriptors(descriptor, subdescriptor, json_descr
                                 if (typeof element_sub_phr[lang]==="undefined")  {
                                     console.log("undefined "+lang);
                                 }
-                                if (element_sub_phr[lang] != null && element_sub_phr[lang].trim()) { // mentioning object means, it has a value, it is not null neither empty string
-                                    phrases_str_to_return.push(element_sub_phr[lang]+'#');
+                                if (element_sub_phr[lang] != null && element_sub_phr[lang].trim() && !element_sub_phr[lang].includes(", , ")) { // mentioning object means, it has a value, it is not null neither empty string
+                                    phrases_str_to_return.push(element_sub_phr[lang]+', ');
                                 }
                         } else if (element_sub_phr["subclusters"] === subdescriptor) {
-                            if (element_sub_phr[lang] != null && element_sub_phr[lang].trim()) { // mentioning object means, it has a value, it is not null neither empty string
-                                phrases_str_to_return.push(element_sub_phr[lang]+'#');
+                            if (element_sub_phr[lang] != null && element_sub_phr[lang].trim() && !element_sub_phr[lang].includes(", , ")) { // mentioning object means, it has a value, it is not null neither empty string
+                                phrases_str_to_return.push(element_sub_phr[lang]+', ');
                             }
                         }
                     }
@@ -159,3 +159,4 @@ $('#btn_clear').click(function (){
 
 $('#select_clusters_number').val(clusters_number)
 $('#select_subclusters_number').val(subclusters_number)
+$('#select_language').val(current_language)
