@@ -12,21 +12,16 @@ from scipy.spatial.distance import pdist
 from sklearn.cluster import KMeans
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-dict_from_csv = list(csv.DictReader(open('phrases.csv')))
-clusters_number = 20
-subclusters_number = 50
-
+dict_from_csv = list(csv.DictReader(open('all_phrases.csv')))
+clusters_number = 50
+subclusters_number = 2500
+languages = ['ukrlang', 'ruslang', 'engllang', 'spanishlang', 'frenchlang', 'itallang', 'latinlang', 'hebrlang']
 
 def count_total_phrases():
-    languages = ['ukrlang', 'ruslang', 'engllang', 'spanishlang', 'frenchlang', 'itallang', 'latinlang', 'hebrlang']
-
     all_phrases_array = []
-    for lang in languages:
-        phrases_array = [phr[lang] for phr in dict_from_csv if phr[lang] != ""]
-        all_phrases_array.extend(phrases_array)
-
-
+    [all_phrases_array.extend([phr[lang] for lang in languages if phr[lang] != ""] )for phr in dict_from_csv]
     print("Total phrases: ", len(all_phrases_array))
+
 
 count_total_phrases()
 
@@ -45,8 +40,8 @@ def get_centroid_feature_for_cluster(descriptors):
     # print(descriptors)
     list_descriptors = []
 
-    for descrs in descriptors:
-       list_descriptors.extend(descrs.split())
+
+    [list_descriptors.extend(descrs.split()) for descrs in descriptors]
 
     all_normalized_descriptors = [ds.replace("*", "").strip().lower() for ds in list_descriptors if len(ds) > 1]
 
@@ -62,19 +57,13 @@ def transform_labels_to_names(labels_hierarchical_1, labels_hierarchical_2, desc
     labels_hierarchical_1_named = []
     labels_hierarchical_2_named = []
 
-    # print(get_centroid_feature_for_cluster([descrs for descrs in descriptors[labels_ward_2 ==2] ]))
 
-    for lbl in labels_hierarchical_1:
-        # print("label")
-        # print(lbl)
-        labels_hierarchical_1_named.append(
-            get_centroid_feature_for_cluster([descrs for descrs in descriptors[labels_hierarchical_1 == lbl]]))
+    [labels_hierarchical_1_named.append(
+            get_centroid_feature_for_cluster([descrs for descrs in descriptors[labels_hierarchical_1 == lbl]])) for lbl in labels_hierarchical_1]
 
-    for lbl in labels_hierarchical_2:
-        # print("label")
-        # print(lbl)
-        labels_hierarchical_2_named.append(
-            get_centroid_feature_for_cluster([descrs for descrs in descriptors[labels_hierarchical_2 == lbl]]))
+
+    [labels_hierarchical_2_named.append(
+            get_centroid_feature_for_cluster([descrs for descrs in descriptors[labels_hierarchical_2 == lbl]])) for lbl in labels_hierarchical_2]
 
     return  labels_hierarchical_1_named, labels_hierarchical_2_named
 
