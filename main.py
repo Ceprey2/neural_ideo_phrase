@@ -13,8 +13,8 @@ from sklearn.cluster import KMeans
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 dict_from_csv = list(csv.DictReader(open('all_phrases.csv')))
-clusters_number = 50
-subclusters_number = 2500
+clusters_number = 100
+subclusters_number = 2731
 languages = ['ukrlang', 'ruslang', 'engllang', 'spanishlang', 'frenchlang', 'itallang', 'latinlang', 'hebrlang']
 
 def count_total_phrases():
@@ -72,7 +72,7 @@ def hierarchical_clustering(dict_from_csv,current_langugage, clusters_number, su
 
     df_dict_from_csv = pd.DataFrame(dict_from_csv)
     descriptors = df_dict_from_csv[current_langugage+'hetmans']
-    phrases =  df_dict_from_csv[current_langugage]
+
     df_dict_from_csv.fillna('null', inplace=True)
 
     # Calculate the linkfage: mergings
@@ -80,9 +80,9 @@ def hierarchical_clustering(dict_from_csv,current_langugage, clusters_number, su
     X = tfidf.fit_transform(descriptors).todense()
     mergings = linkage(X, method="complete")
 
-    terms = tfidf.get_feature_names()
 
-    Z_ward = ward(X)
+
+
     # ClusterNode(Z[1])
     names = tfidf.get_feature_names()
     labeled_rows_by_numbers_hierarchical_level1 = [element[0] for element in cut_tree(mergings, n_clusters=clusters_number)]
@@ -100,7 +100,7 @@ def hierarchical_clustering(dict_from_csv,current_langugage, clusters_number, su
     #            )
     # plt.show()
 
-    labels_hierarchical_1_named, labels_hierarchical_2_named = transform_labels_to_names(labeled_rows_by_numbers_hierarchical_level1, labeled_rows_by_numbers_hierarchical_level2, descriptors)
+    labels_clusters_named, labels_subclusters_named = transform_labels_to_names(labeled_rows_by_numbers_hierarchical_level1, labeled_rows_by_numbers_hierarchical_level2, descriptors)
 
     # print("Varian 1 labels_ward_1")
     # print(labels_hierarchical_1_named)
@@ -116,8 +116,8 @@ def hierarchical_clustering(dict_from_csv,current_langugage, clusters_number, su
     pd.set_option('display.max_columns', 15)
     pd.set_option('display.width', None)
     pd.set_option('display.max_colwidth', 1000)
-    df_hierarchical_labels2_phrases = pd.DataFrame({
-        'subdescriptors': labels_hierarchical_2_named,
+    df_hierarchical_subclusters_phrases = pd.DataFrame({
+        'subdescriptors': labels_subclusters_named,
          "ukrlang": df_dict_from_csv["ukrlang"],
          "engllang": df_dict_from_csv["engllang"],
          "spanishlang": df_dict_from_csv["spanishlang"],
@@ -126,7 +126,7 @@ def hierarchical_clustering(dict_from_csv,current_langugage, clusters_number, su
         "frenchlang": df_dict_from_csv["frenchlang"],
          "latinlang": df_dict_from_csv["latinlang"],
          "hebrlang": df_dict_from_csv["hebrlang"],
-         "subclusters": labels_hierarchical_2_named,
+         "subclusters": labels_subclusters_named,
           }
     ).groupby('subdescriptors').agg(', '.join)
 
@@ -137,13 +137,13 @@ def hierarchical_clustering(dict_from_csv,current_langugage, clusters_number, su
     # "ruslang": df_structured_data["ruslang"],
     # "latinlang": df_structured_data["latinlang"],
     # "hebrlang": df_structured_data["hebrlang"],
-    df_hierarchical_labels2_phrases["subclusters"]=df_hierarchical_labels2_phrases.index
+    df_hierarchical_subclusters_phrases["subclusters"]=df_hierarchical_subclusters_phrases.index
 
-    df_hierarchical_labels1_labels2 = pd.DataFrame({"descriptors": labels_hierarchical_1_named,  "cluster": labels_hierarchical_1_named, "subclusters": labels_hierarchical_2_named  }).sort_values(by=['descriptors']).drop_duplicates()
+    df_hierarchical_clusters_subclusters = pd.DataFrame({"descriptors": labels_clusters_named,  "cluster": labels_clusters_named, "subclusters": labels_subclusters_named  }).sort_values(by=['descriptors', 'subclusters']).drop_duplicates()
 
 
-    df_hierarchical_labels1_labels2 = df_hierarchical_labels1_labels2.groupby('descriptors').agg(', '.join)
-    df_hierarchical_labels1_labels2["cluster"] = df_hierarchical_labels1_labels2.index
+    df_hierarchical_clusters_subclusters = df_hierarchical_clusters_subclusters.groupby('descriptors').agg(', '.join)
+    df_hierarchical_clusters_subclusters["cluster"] = df_hierarchical_clusters_subclusters.index
 
 
 
@@ -160,9 +160,9 @@ def hierarchical_clustering(dict_from_csv,current_langugage, clusters_number, su
 
     df_hierarchical_descriptors_subdescriptors = open('df_hierarchical_descriptors_subdescriptors.csv', 'w')
 
-    df_hierarchical_descriptors_subdescriptors.write(df_hierarchical_labels1_labels2.to_csv())
+    df_hierarchical_descriptors_subdescriptors.write(df_hierarchical_clusters_subclusters.to_csv())
 
-    return df_hierarchical_labels2_phrases.to_json(orient='records'), df_hierarchical_labels1_labels2.to_json(orient='records')
+    return df_hierarchical_subclusters_phrases.to_json(orient='records'), df_hierarchical_clusters_subclusters.to_json(orient='records')
 
 
 
@@ -178,17 +178,22 @@ def k_means_subclusters_phrases(csv_dict_structured_data, number_or_subclusters,
 
     df_structured_data.fillna('null', inplace=True) # replacing Nan cells with null for js to understand during json parsing
 
-    tfidf = TfidfVectorizer(token_pattern=r"(?u)\b\w+'?\w+\b")
+    tfidf = TfidfVectorizer(token_pattern=r"(?u)\b\w+'?’?\w+\b")
     X = tfidf.fit_transform(descriptors)
 
-    # rng = range(number_or_subclusters - 1, number_or_subclusters)
-    #
-    # for k in rng:
-    #     model = KMeans(n_clusters=k, random_state=17)
-    #     model.fit(X)
-    #     inertias.append(model.inertia_)
+    rng = range(200, number_or_subclusters, 200)
 
-    model = KMeans(n_clusters=number_or_subclusters, random_state=17)
+    for k in rng:
+        model = KMeans(n_clusters=k, random_state=17)
+        model.fit(X)
+        inertias.append(model.inertia_)
+    plt.plot(rng, inertias, '-o')
+    plt.xlabel('number of clusters, k')
+    plt.ylabel('inertia')
+    plt.xticks(rng)
+    plt.show()
+
+    #model = KMeans(n_clusters=number_or_subclusters, random_state=17)
     model.fit(X)
 
     order_centroids = model.cluster_centers_.argsort()[:, ::-1]
